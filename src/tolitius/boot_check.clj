@@ -3,11 +3,10 @@
   (:require [boot.core :as core :refer [deftask user-files set-env! get-env]]
             [boot.pod  :as pod]))
 
-(def kibit-dep
-  '[jonase/kibit "0.1.2"])
-
-(def tn-dep
-  '[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]])
+(def pod-deps
+  '[[jonase/kibit "0.1.2"]
+    [org.clojure/tools.cli "0.3.3"]
+    [org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
 (defn init [fresh-pod]
   (doto fresh-pod
@@ -27,8 +26,8 @@
   ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
   []
   (let [pod-deps (update-in (core/get-env) [:dependencies]
-                            into [tn-dep kibit-dep])
-        worker-pods (pod/pod-pool pod-deps :init (partial init))]
+                            into pod-deps)
+        worker-pods (pod/pod-pool pod-deps :init init)]
     (core/cleanup (worker-pods :shutdown))
     (core/with-pre-wrap fileset
       (let [worker-pod (worker-pods :refresh)
