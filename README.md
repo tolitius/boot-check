@@ -1,6 +1,6 @@
 # boot-check
 
-[Boot](https://github.com/boot-clj/boot) tasks to check, analyze, inspect Clojure/Script code.
+[Boot](https://github.com/boot-clj/boot) tasks to check, analyze and inspect Clojure/Script code.
 
 It relies on universe tested [kibit](https://github.com/jonase/kibit), 
 [eastwood](https://github.com/jonase/eastwood) and other titans.
@@ -13,12 +13,12 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
 
 To check your code directly from shell:
 
-```clojure
+```bash
 $ boot check/with-kibit
 latest report from kibit.... [You Rock!]
 ```
 
-In case there are problems:
+In case there are [problems](test/test/with_kibit.clj):
 
 ```clojure
 (defn when-vs-if []
@@ -63,7 +63,7 @@ To use boot-check tasks within `build.boot` is easy:
 
 #### Help
 
-```clojure
+```shell
 $ boot check/with-kibit -h
 Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
 
