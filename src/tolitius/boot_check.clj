@@ -3,10 +3,12 @@
   (:require [boot.core :as core :refer [deftask user-files set-env! get-env]]
             [boot.pod  :as pod]))
 
-(def pod-deps
+(def kibit-deps
   '[[jonase/kibit "0.1.2"]
-    [org.clojure/tools.cli "0.3.3"]
-    [org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
+    [org.clojure/tools.cli "0.3.3"]])
+
+(def pod-deps
+  '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
 (defn bootstrap [fresh-pod]
   (doto fresh-pod
@@ -24,7 +26,7 @@
     (core/cleanup (pool :shutdown))
   pool))
 
-(defn- kibit-it [pod-pool fileset]
+(defn- kibit-it [pod-pool fileset & args]
   (let [worker-pod (pod-pool :refresh)
         namespaces (pod/with-eval-in worker-pod
                      (all-ns* ~@(->> fileset
@@ -37,8 +39,7 @@
       (boot.util/dbug (str "kibit is about to look at: -- " '~sources " --"))
       (require '[kibit.driver :as kibit])
       (doseq [ns '~namespaces] (require ns))
-      (let [problems (apply kibit.driver/run '~sources nil [])]   ;; nil for "rules" which would expand to all-rules,
-        ;; [] for args that are to come
+      (let [problems (apply kibit.driver/run '~sources nil '~args)]   ;; nil for "rules" which would expand to all-rules,
         (if-not (zero? (count problems))
           (throw (ex-info "kibit found some problems: " {:problems (set problems)}))
           (boot.util/info "latest report from kibit.... [You Rock!]\n"))))))
@@ -51,7 +52,7 @@
   At the moment it takes no arguments, but behold..! it will. (files, rules, reporters, etc..)"
   ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
   []
-  (let [pod-pool (ppool pod-deps bootstrap)]
+  (let [pod-pool (ppool (concat pod-deps kibit-deps) bootstrap)]
     (core/with-pre-wrap fileset
-      (kibit-it pod-pool fileset)
+      (kibit-it pod-pool fileset) ;; TODO with args
       fileset)))
