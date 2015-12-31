@@ -1,7 +1,8 @@
 (ns tolitius.boot-check
   {:boot/export-tasks true}
   (:require [boot.core :as core :refer [deftask user-files set-env! get-env]]
-            [boot.pod  :as pod]))
+            [boot.pod  :as pod]
+            [boot.util :refer [dbug]]))
 
 (def kibit-dep
   '[jonase/kibit "0.1.2"])
@@ -38,7 +39,8 @@
                                          (map (memfn getPath)))))
             sources (->> fileset
                          user-files
-                         (map (comp #(.getAbsolutePath %) core/tmp-file)))]
+                         (map (comp #(.getAbsolutePath %) core/tmp-file)))
+            _ (dbug "kibit is about to look at: [" sources "]")]
         (pod/with-eval-in worker-pod
           (require '[kibit.driver :as kibit])
           (doseq [ns '~namespaces] (require ns))
