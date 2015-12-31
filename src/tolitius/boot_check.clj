@@ -45,6 +45,6 @@
           (let [problems (apply kibit.driver/run '~sources nil [])]   ;; nil for "rules" which would expand to all-rules,
                                                                       ;; [] for args that are to come
             (if-not (zero? (count problems))
-              (boot.util/fail (str "\nkibit found some problems: " (set problems) "\n"))
+              (throw (ex-info "kibit found some problems: " {:problems (set problems)}))
               (boot.util/info "latest report from kibit.... [You Rock!]\n"))))
         fileset))))
