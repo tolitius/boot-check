@@ -73,14 +73,14 @@ To use boot-check tasks within `build.boot` is easy:
 
 To check your code directly from shell:
 
-```clojure
+```shell
 $ boot -v check/with-yagni
 latest report from yagni.... [You Rock!]
 ```
 
 if Yagni finds [unused code](test/test/with_yagni.clj) it will gladly report the news:
 
-```clojure
+```shell
 WARN: could not find any references to the following:
 
 tolitius.yagni/check
@@ -90,7 +90,7 @@ tolitius.yagni/report
 test.with-kibit/vec-vs-into
 test.with-yagni/-main
 
-WARN: The following have references to them, but their parents do not:
+WARN: the following have references to them, but their parents do not:
 
 tolitius.yagni/yagni-deps
 tolitius.yagni/pp

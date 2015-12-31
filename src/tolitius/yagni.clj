@@ -24,4 +24,4 @@
   (when no-refs
     (boot.util/warn (str "\n\nWARN: could not find any references to the following:\n\n" (pp no-refs))))
   (when no-parent-refs
-    (boot.util/warn (str "\n\nWARN: The following have references to them, but their parents do not:\n\n" (pp no-parent-refs)))))
+    (boot.util/warn (str "\n\nWARN: the following have references to them, but their parents do not:\n\n" (pp no-parent-refs)))))
