@@ -14,6 +14,11 @@
   (comp
     (check/with-kibit)))
 
+(deftask test-yagni []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-yagni)))
+
 (bootlaces! +version+)
 
 (task-options!
