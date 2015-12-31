@@ -1,8 +1,7 @@
 (ns tolitius.boot-check
   {:boot/export-tasks true}
   (:require [boot.core :as core :refer [deftask user-files set-env! get-env]]
-            [boot.pod  :as pod]
-            [boot.util :refer [dbug]]))
+            [boot.pod  :as pod]))
 
 (def kibit-dep
   '[jonase/kibit "0.1.2"])
@@ -39,12 +38,13 @@
                                          (map (memfn getPath)))))
             sources (->> fileset
                          user-files
-                         (map (comp #(.getAbsolutePath %) core/tmp-file)))
-            _ (dbug "kibit is about to look at: [" sources "]")]
+                         (mapv (comp #(.getAbsolutePath %) core/tmp-file)))]
         (pod/with-eval-in worker-pod
+          (boot.util/dbug (str "kibit is about to look at: -- " '~sources " --"))
           (require '[kibit.driver :as kibit])
           (doseq [ns '~namespaces] (require ns))
-          (let [problems (kibit.driver/run '~sources nil)]   ;; nil for "rules" which would expand to all-rules
+          (let [problems (apply kibit.driver/run '~sources nil [])]   ;; nil for "rules" which would expand to all-rules,
+                                                                      ;; [] for args that are to come
             (if-not (zero? (count problems))
               (boot.util/fail (str "\nkibit found some problems: " (set problems) "\n"))
               (boot.util/info "latest report from kibit.... [You Rock!]\n"))))
