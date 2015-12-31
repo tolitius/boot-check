@@ -8,7 +8,7 @@
     [org.clojure/tools.cli "0.3.3"]
     [org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
-(defn init [fresh-pod]
+(defn bootstrap [fresh-pod]
   (doto fresh-pod
     (pod/with-eval-in
      (require '[clojure.java.io :as io]
@@ -16,6 +16,32 @@
 
      (defn all-ns* [& dirs]
        (distinct (mapcat #(find-namespaces-in-dir (io/file %)) dirs))))))
+
+(defn ppool [deps init]
+  (let [pod-deps (update-in (core/get-env) [:dependencies]
+                            into deps)
+        pool (pod/pod-pool pod-deps :init init)]
+    (core/cleanup (pool :shutdown))
+  pool))
+
+(defn- kibit-it [pod-pool fileset]
+  (let [worker-pod (pod-pool :refresh)
+        namespaces (pod/with-eval-in worker-pod
+                     (all-ns* ~@(->> fileset
+                                     core/input-dirs
+                                     (map (memfn getPath)))))
+        sources (->> fileset
+                     user-files
+                     (mapv (comp #(.getAbsolutePath %) core/tmp-file)))]
+    (pod/with-eval-in worker-pod
+      (boot.util/dbug (str "kibit is about to look at: -- " '~sources " --"))
+      (require '[kibit.driver :as kibit])
+      (doseq [ns '~namespaces] (require ns))
+      (let [problems (apply kibit.driver/run '~sources nil [])]   ;; nil for "rules" which would expand to all-rules,
+        ;; [] for args that are to come
+        (if-not (zero? (count problems))
+          (throw (ex-info "kibit found some problems: " {:problems (set problems)}))
+          (boot.util/info "latest report from kibit.... [You Rock!]\n"))))))
 
 (deftask with-kibit
   "Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
@@ -25,26 +51,7 @@
   At the moment it takes no arguments, but behold..! it will. (files, rules, reporters, etc..)"
   ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
   []
-  (let [pod-deps (update-in (core/get-env) [:dependencies]
-                            into pod-deps)
-        worker-pods (pod/pod-pool pod-deps :init init)]
-    (core/cleanup (worker-pods :shutdown))
+  (let [pod-pool (ppool pod-deps bootstrap)]
     (core/with-pre-wrap fileset
-      (let [worker-pod (worker-pods :refresh)
-            namespaces (pod/with-eval-in worker-pod
-                         (all-ns* ~@(->> fileset
-                                         core/input-dirs
-                                         (map (memfn getPath)))))
-            sources (->> fileset
-                         user-files
-                         (mapv (comp #(.getAbsolutePath %) core/tmp-file)))]
-        (pod/with-eval-in worker-pod
-          (boot.util/dbug (str "kibit is about to look at: -- " '~sources " --"))
-          (require '[kibit.driver :as kibit])
-          (doseq [ns '~namespaces] (require ns))
-          (let [problems (apply kibit.driver/run '~sources nil [])]   ;; nil for "rules" which would expand to all-rules,
-                                                                      ;; [] for args that are to come
-            (if-not (zero? (count problems))
-              (throw (ex-info "kibit found some problems: " {:problems (set problems)}))
-              (boot.util/info "latest report from kibit.... [You Rock!]\n"))))
-        fileset))))
+      (kibit-it pod-pool fileset)
+      fileset)))
