@@ -48,8 +48,10 @@ Consider using:
 instead of:
   (into [] 42)
 
-clojure.lang.ExceptionInfo: kibit found some problems:  {:problems #{{:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)}
-                                                                     {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)}}}
+WARN: kibit found some problems:
+
+{:problems #{{:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)} 
+             {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)}}}
 ```
 
 ### From Within "build.boot"
