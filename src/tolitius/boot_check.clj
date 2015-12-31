@@ -1,14 +1,12 @@
 (ns tolitius.boot-check
   {:boot/export-tasks true}
-  (:require [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
+  (:require [tolitius.yagni :as ty]
+            [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
             [boot.pod  :as pod]))
 
 (def kibit-deps
   '[[jonase/kibit "0.1.2"]
     [org.clojure/tools.cli "0.3.3"]])
-
-(def yagni-deps
-  '[[venantius/yagni "0.1.4" :exclusions [org.clojure/clojure]]])
 
 (def pod-deps
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
@@ -56,13 +54,12 @@
     (pod/with-eval-in worker-pod
       (boot.util/dbug (str "yagni is about to look at: -- " '~sources " --"))
       (require '[yagni.core :as yagni])
-      (require '[yagni.reporter :refer [report]])
-      ;; (doseq [ns '~namespaces] (require ns))
-      (let [graph# (binding [*ns* 'tolitius/boot-check] 
+      (require '[tolitius.yagni :as tyagni])
+      (let [graph# (binding [*ns* (the-ns *ns*)] 
                      (yagni/construct-reference-graph '~sources))
-            has-unused-vars?# (report graph#)]
-        (if has-unused-vars?#
-          (throw (ex-info "yagni found unused vars"))
+            problems# (tyagni/check graph#)]
+        (if (seq problems#)
+          (tyagni/report problems#)
           (boot.util/info "\nlatest report from yagni.... [You Rock!]\n"))))))
 
 (deftask with-kibit
@@ -85,7 +82,7 @@
 
   At the moment it takes no arguments, but behold..! it will."
   []
-  (let [pod-pool (ppool (concat pod-deps yagni-deps) bootstrap)]
+  (let [pod-pool (ppool (concat pod-deps ty/yagni-deps) bootstrap)]
     (core/with-pre-wrap fileset
       (yagni-it pod-pool fileset) ;; TODO with args
       fileset)))
