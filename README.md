@@ -78,7 +78,7 @@ $ boot -v check/with-yagni
 latest report from yagni.... [You Rock!]
 ```
 
-if Yagni finds unused code it will gladly report the news:
+if Yagni finds [unused code](test/test/with_yagni.clj) it will gladly report the news:
 
 ```clojure
 WARN: could not find any references to the following:
