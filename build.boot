@@ -19,6 +19,11 @@
   (comp
     (check/with-yagni)))
 
+(deftask test-eastwood []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-eastwood)))
+
 (bootlaces! +version+)
 
 (task-options!
