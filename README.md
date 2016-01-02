@@ -7,8 +7,6 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
 
 [![Clojars Project](http://clojars.org/tolitius/boot-check/latest-version.svg)](http://clojars.org/tolitius/boot-check)
 
-###### _Source Code Static Analyzers_
-
 ## Kibit
 
 [kibit](https://github.com/jonase/kibit) is a static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
@@ -56,7 +54,7 @@ WARN: kibit found some problems:
 
 ### From Within "build.boot"
 
-To use boot-check tasks within `build.boot` is easy:
+To use `boot-check` tasks within `build.boot` is easy:
 
 ```clojure
 (require '[tolitius.boot-check :as check])
@@ -103,7 +101,7 @@ test.with-yagni/notafunc
 
 ### From Within "build.boot"
 
-To use boot-check tasks within `build.boot` is easy:
+To use `boot-check` tasks within `build.boot` is easy:
 
 ```clojure
 (require '[tolitius.boot-check :as check])
@@ -112,6 +110,45 @@ To use boot-check tasks within `build.boot` is easy:
   (set-env! :source-paths #{"src" "test"})
   (comp
     (check/with-yagni)))
+```
+
+## Eastwood
+
+[eastwood]() is a Clojure [lint](http://en.wikipedia.org/wiki/Lint_%28software%29) tool that uses the [tools.analyzer](https://github.com/clojure/tools.analyzer) and [tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm) libraries to inspect namespaces and report possible problems
+
+### From Command Line
+
+To check your code directly from shell:
+
+```shell
+$ boot -v check/with-eastwood
+latest report from eastwood.... [You Rock!]
+```
+if eastwood finds [problems](test/test/with_eastwood.clj) it will gladly report the news:
+
+```shell
+== Linting test.with-kibit ==
+... /test/with_kibit.clj:4:3: constant-test: Test expression is always logical true or always logical false: 42 in form (if 42 42 nil)
+
+== Linting test.with-eastwood ==
+... /test/with_eastwood.clj:5:8: def-in-def: There is a def of a nested inside def nested-def
+
+== Warnings: 2 (not including reflection warnings)  Exceptions thrown: 0
+
+WARN: eastwood found some problems ^^^
+```
+
+### From Within "build.boot"
+
+To use `boot-check` tasks within `build.boot` is easy:
+
+```clojure
+(require '[tolitius.boot-check :as check])
+
+(deftask check-sources []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-eastwood)))
 ```
 
 ## Help
@@ -139,6 +176,20 @@ Static code analyzer for Clojure that helps you find unused code in your applica
 This task will run all the yagni checks within a pod.
 
 At the moment it takes no arguments, but behold..! it will.
+
+Options:
+  -h, --help  Print this help info.
+```
+
+### eastwood
+
+```shell
+$ boot check/with-eastwood -h
+Clojure lint tool that uses the tools.analyzer and tools.analyzer.jvm libraries to inspect namespaces and report possible problems
+
+This task will run all the eastwood checks within a pod.
+
+At the moment it takes no arguments, but behold..! it will. (linters, namespaces, etc.)
 
 Options:
   -h, --help  Print this help info.
