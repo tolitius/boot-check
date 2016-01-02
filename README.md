@@ -7,6 +7,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
 
 [![Clojars Project](http://clojars.org/tolitius/boot-check/latest-version.svg)](http://clojars.org/tolitius/boot-check)
 
+- [Why](#why)
 - [Kibit](#kibit)
   - [From Command Line](#from-command-line)
   - [From within "build.boot"](#from-within-buildboot)
@@ -20,6 +21,28 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From within "build.boot"](#from-within-buildboot-2)
   - [Help](#help-2)
 - [License](#license)
+
+## Why
+
+To be able to compose multiple code analyzers as [Boot tasks](https://github.com/boot-clj/boot/wiki/Tasks):
+
+```clojure
+(require '[tolitius.boot-check :as check])
+```
+
+```clojure
+(deftask check-sources []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-yagni)
+    (check/with-eastwood)
+    (check/with-kibit)
+    (check/with-bikeshed)))
+```
+
+`boot-check` will do the rest: integration with analyzers, dependencies, reports, etc..
+
+All these tasks will run inside [Boot pods](https://github.com/boot-clj/boot/wiki/Pods).
 
 ## Kibit
 
