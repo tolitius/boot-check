@@ -7,6 +7,20 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
 
 [![Clojars Project](http://clojars.org/tolitius/boot-check/latest-version.svg)](http://clojars.org/tolitius/boot-check)
 
+- [Kibit](#kibit)
+  - [From Command Line](#from-command-line)
+  - [From within "build.boot"](#from-within-buildboot)
+  - [Help](#help)
+- [Yagni](#yagni)
+  - [From Command Line](#from-command-line-1)
+  - [From within "build.boot"](#from-within-buildboot-1)
+  - [Help](#help-1)
+- [Eastwood](#eastwood)
+  - [From Command Line](#from-command-line-2)
+  - [From within "build.boot"](#from-within-buildboot-2)
+  - [Help](#help-2)
+- [License](#license)
+
 ## Kibit
 
 [kibit](https://github.com/jonase/kibit) is a static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
@@ -52,7 +66,7 @@ WARN: kibit found some problems:
              {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)}}}
 ```
 
-### From Within "build.boot"
+### From within "build.boot"
 
 To use `boot-check` tasks within `build.boot` is easy:
 
@@ -63,6 +77,20 @@ To use `boot-check` tasks within `build.boot` is easy:
   (set-env! :source-paths #{"src" "test"})
   (comp
     (check/with-kibit)))
+```
+
+### Help
+
+```shell
+$ boot check/with-kibit -h
+Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
+
+This task will run all the kibit checks within a pod.
+
+At the moment it takes no arguments, but behold..! it will. (files, rules, reporters, etc..)
+
+Options:
+  -h, --help  Print this help info.
 ```
 
 ## Yagni
@@ -99,7 +127,7 @@ test.with-yagni/func
 test.with-yagni/notafunc
 ```
 
-### From Within "build.boot"
+### From within "build.boot"
 
 To use `boot-check` tasks within `build.boot` is easy:
 
@@ -110,6 +138,20 @@ To use `boot-check` tasks within `build.boot` is easy:
   (set-env! :source-paths #{"src" "test"})
   (comp
     (check/with-yagni)))
+```
+
+### Help
+
+```shell
+$ boot check/with-yagni -h
+Static code analyzer for Clojure that helps you find unused code in your applications and libraries.
+
+This task will run all the yagni checks within a pod.
+
+At the moment it takes no arguments, but behold..! it will.
+
+Options:
+  -h, --help  Print this help info.
 ```
 
 ## Eastwood
@@ -138,7 +180,7 @@ if eastwood finds [problems](test/test/with_eastwood.clj) it will gladly report 
 WARN: eastwood found some problems ^^^
 ```
 
-### From Within "build.boot"
+### From within "build.boot"
 
 To use `boot-check` tasks within `build.boot` is easy:
 
@@ -151,37 +193,7 @@ To use `boot-check` tasks within `build.boot` is easy:
     (check/with-eastwood)))
 ```
 
-## Help
-
-### kibit
-
-```shell
-$ boot check/with-kibit -h
-Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
-
-This task will run all the kibit checks within a pod.
-
-At the moment it takes no arguments, but behold..! it will. (files, rules, reporters, etc..)
-
-Options:
-  -h, --help  Print this help info.
-```
-
-### yagni
-
-```shell
-$ boot check/with-yagni -h
-Static code analyzer for Clojure that helps you find unused code in your applications and libraries.
-
-This task will run all the yagni checks within a pod.
-
-At the moment it takes no arguments, but behold..! it will.
-
-Options:
-  -h, --help  Print this help info.
-```
-
-### eastwood
+### Help
 
 ```shell
 $ boot check/with-eastwood -h
