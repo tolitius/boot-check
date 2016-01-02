@@ -2,6 +2,10 @@
   (:require [boot.core :as core]
             [boot.pod  :as pod]))
 
+(defn tmp-dir-paths [fs]
+  (mapv #(.getAbsolutePath %) 
+        (core/user-dirs fs)))
+
 (defn fileset->paths [fileset]
   (->> fileset
        core/user-files

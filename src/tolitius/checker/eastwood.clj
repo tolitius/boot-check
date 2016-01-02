@@ -12,15 +12,16 @@
                      (all-ns* ~@(->> fileset
                                      core/input-dirs
                                      (map (memfn getPath)))))
-        sources (fileset->paths fileset)]
+        sources (tmp-dir-paths fileset)]
     (pod/with-eval-in worker-pod
       (boot.util/dbug (str "eastwood is about to look at: -- " '~sources " --"))
       (require '[eastwood.lint :as eastwood])
+      ;; (require '[boot.core :as core])
+      ;; (boot.core/load-data-readers!)
       (doseq [ns '~namespaces] (require ns))
-      (let [{:keys [err 
-                    warning-count 
-                    exception-count] :as problems#} (eastwood/eastwood-core {:source-paths '~sources})]
-        (if (or err (and (number? warning-count)
-                         (or (> warning-count 0) (> exception-count 0))))
-          (boot.util/warn (str "\nWARN: eastwood found some problems: \n\n" {:problems (set problems#)} "\n"))
+      (let [{:keys [some-warnings]} (eastwood/eastwood {:source-paths '~sources
+                                                        ;; :debug #{:ns}
+                                                        })]
+        (if some-warnings
+          (boot.util/warn (str "\nWARN: eastwood found some problems ^^^ \n\n"))
           (boot.util/info "\nlatest report from eastwood.... [You Rock!]\n"))))))
