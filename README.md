@@ -24,7 +24,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
 
 ## Why
 
-To be able to compose multiple code analyzers as [Boot tasks](https://github.com/boot-clj/boot/wiki/Tasks):
+To be able to reach out to multiple code analyzers as well as compose them as [Boot tasks](https://github.com/boot-clj/boot/wiki/Tasks):
 
 ```clojure
 (require '[tolitius.boot-check :as check])
@@ -40,7 +40,7 @@ To be able to compose multiple code analyzers as [Boot tasks](https://github.com
     (check/with-bikeshed)))
 ```
 
-`boot-check` will do the rest: integration with analyzers, dependencies, reports, etc..
+You can choose the tools (tasks) that apply, i.e. use one or several, and `boot-check` will do the rest: integration with analyzers, dependencies, reports, etc..
 
 All these tasks will run inside [Boot pods](https://github.com/boot-clj/boot/wiki/Pods).
 
