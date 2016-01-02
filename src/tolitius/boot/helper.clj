@@ -4,7 +4,7 @@
 
 (defn tmp-dir-paths [fs]
   (mapv #(.getAbsolutePath %) 
-        (core/user-dirs fs)))
+        (core/input-dirs fs)))
 
 (defn fileset->paths [fileset]
   (->> fileset

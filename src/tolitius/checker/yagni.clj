@@ -27,9 +27,9 @@
         sources (fileset->paths fileset)]
     (pod/with-eval-in worker-pod
       (boot.util/dbug (str "yagni is about to look at: -- " '~sources " --"))
-      (require '[yagni.core :as yagni])
-      (require '[yagni.graph :refer [find-children-and-parents]])
-      (require '[tolitius.checker.yagni :refer [check-graph report]])
+      (require '[yagni.core :as yagni]
+               '[yagni.graph :refer [find-children-and-parents]]
+               '[tolitius.checker.yagni :refer [check-graph report]])
       (let [graph# (binding [*ns* (the-ns *ns*)] 
                      (yagni/construct-reference-graph '~sources))
             problems# (check-graph find-children-and-parents graph#)]

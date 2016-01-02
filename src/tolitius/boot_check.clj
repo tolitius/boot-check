@@ -14,7 +14,8 @@
   (doto fresh-pod
     (pod/with-eval-in
      (require '[clojure.java.io :as io]
-              '[clojure.tools.namespace.find :refer [find-namespaces-in-dir]])
+              '[clojure.tools.namespace.find :refer [find-namespaces-in-dir]]
+              '[tolitius.boot.helper :refer :all])
 
      (defn all-ns* [& dirs]
        (distinct (mapcat #(find-namespaces-in-dir (io/file %)) dirs))))))
