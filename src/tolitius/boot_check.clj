@@ -3,6 +3,7 @@
   (:require [tolitius.checker.yagni :as yagni :refer [yagni-deps]]
             [tolitius.checker.kibit :as kibit :refer [kibit-deps]]
             [tolitius.checker.eastwood :as eastwood :refer [eastwood-deps]]
+            [tolitius.checker.bikeshed :as bikeshed :refer [bikeshed-deps]]
             [tolitius.boot.helper :refer :all]
             [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
             [boot.pod  :as pod]))
@@ -56,4 +57,17 @@
   (let [pod-pool (make-pod-pool (concat pod-deps eastwood-deps) bootstrap)]
     (core/with-pre-wrap fileset
       (eastwood/check pod-pool fileset) ;; TODO with args
+      fileset)))
+
+(deftask with-bikeshed
+  "This task is backed by 'lein-bikeshed' which is designed to tell you your code is bad, and that you should feel bad
+
+  This task will run all the bikeshed checks within a pod.
+
+  At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-length', etc.)"
+  ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
+  []
+  (let [pod-pool (make-pod-pool (concat pod-deps bikeshed-deps) bootstrap)]
+    (core/with-pre-wrap fileset
+      (bikeshed/check pod-pool fileset) ;; TODO with args
       fileset)))

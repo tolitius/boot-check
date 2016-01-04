@@ -1,4 +1,4 @@
-(def +version+ "0.1.1-SNAPSHOT")
+(def +version+ "0.1.1")
 
 (set-env!
   :source-paths #{"src"}
@@ -23,6 +23,11 @@
   (set-env! :source-paths #{"src" "test"})
   (comp
     (check/with-eastwood)))
+
+(deftask test-bikeshed []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-bikeshed)))
 
 (bootlaces! +version+)
 
