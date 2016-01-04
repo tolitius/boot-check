@@ -20,6 +20,10 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From Command Line](#from-command-line-2)
   - [From within "build.boot"](#from-within-buildboot-2)
   - [Help](#help-2)
+- [Bikeshed](#bikeshed)
+  - [From Command Line](#from-command-line-2)
+  - [From within "build.boot"](#from-within-buildboot-2)
+  - [Help](#help-2)
 - [License](#license)
 
 ## Why
@@ -118,7 +122,7 @@ Options:
 
 ## Yagni
 
-[yagni](https://github.com/venantius/yagni) is a static code analyzer that helps you find unused code in your applications and libraries
+[yagni](https://github.com/venantius/yagni) is a static code analyzer that helps you find unused code in your applications and libraries.
 
 ### From Command Line
 
@@ -179,7 +183,7 @@ Options:
 
 ## Eastwood
 
-[eastwood]() is a Clojure [lint](http://en.wikipedia.org/wiki/Lint_%28software%29) tool that uses the [tools.analyzer](https://github.com/clojure/tools.analyzer) and [tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm) libraries to inspect namespaces and report possible problems
+[eastwood](https://github.com/jonase/eastwood) is a Clojure [lint](http://en.wikipedia.org/wiki/Lint_%28software%29) tool that uses the [tools.analyzer](https://github.com/clojure/tools.analyzer) and [tools.analyzer.jvm](https://github.com/clojure/tools.analyzer.jvm) libraries to inspect namespaces and report possible problems.
 
 ### From Command Line
 
@@ -225,6 +229,78 @@ Clojure lint tool that uses the tools.analyzer and tools.analyzer.jvm libraries 
 This task will run all the eastwood checks within a pod.
 
 At the moment it takes no arguments, but behold..! it will. (linters, namespaces, etc.)
+
+Options:
+  -h, --help  Print this help info.
+```
+
+## Bikeshed
+
+[bikeshed](https://github.com/dakrone/lein-bikeshed) is a Clojure "checkstyle/pmd" tool that designed to tell you your code is bad, and that you should feel bad.
+
+### From Command Line
+
+To check your code directly from shell:
+
+```shell
+$ boot -v check/with-bikeshed
+latest report from bikeshed.... [You Rock!]
+```
+if bikeshed finds problems it will gladly report the news:
+
+```shell
+Checking for lines longer than 80 characters.
+Badly formatted files:
+../tolitius/boot_check.clj:8:            [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
+../tolitius/boot_check.clj:25:  "Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.
+../tolitius/boot_check.clj:29:  At the moment it takes no arguments, but behold..! it will. (files, rules, reporters, etc..)"
+../tolitius/boot_check.clj:30:  ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
+
+Checking for lines with trailing whitespace.
+Badly formatted files:
+../tolitius/boot/helper.clj:6:  (mapv #(.getAbsolutePath %)
+../tolitius/checker/bikeshed.clj:7:  '[[lein-bikeshed "0.2.0" :exclusions [org.clojure/tools.cli
+../tolitius/checker/yagni.clj:33:      (let [graph# (binding [*ns* (the-ns *ns*)]
+../tolitius/boot/helper.clj:6:  (mapv #(.getAbsolutePath %)
+../tolitius/checker/bikeshed.clj:7:  '[[lein-bikeshed "0.2.0" :exclusions [org.clojure/tools.cli
+../tolitius/checker/yagni.clj:33:      (let [graph# (binding [*ns* (the-ns *ns*)]
+
+Checking for files ending in blank lines.
+No files found.
+
+Checking for redefined var roots in source directories.
+No with-redefs found.
+
+Checking whether you keep up with your docstrings.
+9/50 [18.00%] functions have docstrings.
+Use -v to list functions without docstrings
+
+WARN: bikeshed found some problems ^^^
+```
+
+### From within "build.boot"
+
+To use `boot-check` tasks within `build.boot` is easy:
+
+```clojure
+(require '[tolitius.boot-check :as check])
+
+(deftask check-sources []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-bikeshed)))
+```
+
+### Help
+
+```shell
+$ boot check/with-bikeshed -h
+
+This task is backed by 'lein-bikeshed' which is designed to tell you your code is bad, and that you should feel bad
+
+This task will run all the bikeshed checks within a pod.
+
+At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-length', etc.)
 
 Options:
   -h, --help  Print this help info.
