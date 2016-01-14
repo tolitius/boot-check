@@ -24,6 +24,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From Command Line](#from-command-line-2)
   - [From within "build.boot"](#from-within-buildboot-2)
   - [Help](#help-2)
+- [Demo](#demo)
 - [License](#license)
 
 ## Why
@@ -129,7 +130,7 @@ Options:
 To check your code directly from shell:
 
 ```shell
-$ boot -v check/with-yagni
+$ boot check/with-yagni
 latest report from yagni.... [You Rock!]
 ```
 
@@ -190,7 +191,7 @@ Options:
 To check your code directly from shell:
 
 ```shell
-$ boot -v check/with-eastwood
+$ boot check/with-eastwood
 latest report from eastwood.... [You Rock!]
 ```
 if eastwood finds [problems](test/test/with_eastwood.clj) it will gladly report the news:
@@ -243,7 +244,7 @@ Options:
 To check your code directly from shell:
 
 ```shell
-$ boot -v check/with-bikeshed
+$ boot check/with-bikeshed
 latest report from bikeshed.... [You Rock!]
 ```
 if bikeshed finds problems it will gladly report the news:
@@ -305,6 +306,10 @@ At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-len
 Options:
   -h, --help  Print this help info.
 ```
+
+## Demo
+
+Here is a boot check [demo project](https://github.com/tolitius/check-boot-check) which can be cloned and played with.
 
 ## License
 
