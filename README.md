@@ -3,7 +3,7 @@
 [Boot](https://github.com/boot-clj/boot) tasks to check, analyze and inspect Clojure/Script code.
 
 It relies on universe tested [kibit](https://github.com/jonase/kibit), 
-[eastwood](https://github.com/jonase/eastwood), [yagni](https://github.com/venantius/yagni) and other titans.
+[eastwood](https://github.com/jonase/eastwood), [yagni](https://github.com/venantius/yagni), [bikeshed](https://github.com/dakrone/lein-bikeshed) and other titans.
 
 [![Clojars Project](http://clojars.org/tolitius/boot-check/latest-version.svg)](http://clojars.org/tolitius/boot-check)
 
