@@ -2,7 +2,7 @@
 
 (set-env!
   :source-paths #{"src"}
-  :dependencies '[[boot/core              "2.5.1"           :scope "test"]
+  :dependencies '[[boot/core              "2.5.5"]
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]])
 
 (require '[tolitius.boot-check :as check]
