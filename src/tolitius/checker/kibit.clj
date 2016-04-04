@@ -1,6 +1,6 @@
 (ns tolitius.checker.kibit
   (:require [tolitius.boot.helper :refer :all]
-            [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
+            [boot.core :as core]
             [boot.pod  :as pod]))
 
 (def kibit-deps

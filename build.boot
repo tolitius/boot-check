@@ -29,6 +29,13 @@
   (comp
     (check/with-bikeshed)))
 
+(deftask check-all []
+  (comp
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed)))
+
 (bootlaces! +version+)
 
 (task-options!

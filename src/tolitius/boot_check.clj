@@ -5,7 +5,7 @@
             [tolitius.checker.eastwood :as eastwood :refer [eastwood-deps]]
             [tolitius.checker.bikeshed :as bikeshed :refer [bikeshed-deps]]
             [tolitius.boot.helper :refer :all]
-            [boot.core :as core :refer [deftask user-files tmp-file set-env! get-env]]
+            [boot.core :as core :refer [deftask]]
             [boot.pod  :as pod]))
 
 (def pod-deps

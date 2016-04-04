@@ -1,6 +1,5 @@
 (ns tolitius.checker.yagni
-  (:require [boot.core :refer [get-env]]
-            [boot.pod :as pod]
+  (:require [boot.pod :as pod]
             [tolitius.boot.helper :refer :all]
             [clojure.string :as s]))
 
