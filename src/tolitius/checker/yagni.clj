@@ -6,6 +6,9 @@
 (def yagni-deps
   '[[venantius/yagni "0.1.4" :exclusions [org.clojure/clojure]]])
 
+;; yagni implementation (07/26/2016) is coupled with a lein specific file
+(defonce entry-points-file ".lein-yagni")
+
 (defn- pp [s]
   (s/join "\n" s))
 
@@ -21,15 +24,25 @@
   (when no-parent-refs
     (boot.util/warn (str "\nWARN: the following have references to them, but their parents do not:\n\n" (pp no-parent-refs) "\n"))))
 
-(defn check [pod-pool fileset & args]
+(defn create-entry-points [entry-points]
+  (when entry-points
+    (->> (interpose "\n" entry-points)
+         (apply str)
+         (spit entry-points-file))))
+
+(defn check [pod-pool fileset {:keys [entry-points]}]
   (let [worker-pod (pod-pool :refresh)
         sources (fileset->paths fileset)]
     (pod/with-eval-in worker-pod
-      (boot.util/dbug (str "yagni is about to look at: -- " '~sources " --"))
+      (boot.util/dbug (str "yagni is about to look at: -- " '~sources " --"
+                        (if '~entry-points 
+                          (str "\nwith entry points -- " '~entry-points " --")
+                          "\nwith no entry points")))
       (require '[yagni.core :as yagni]
                '[yagni.graph :refer [find-children-and-parents]]
-               '[tolitius.checker.yagni :refer [check-graph report]])
-      (let [graph# (binding [*ns* (the-ns *ns*)] 
+               '[tolitius.checker.yagni :refer [check-graph report create-entry-points]])
+      (let [graph# (binding [*ns* (the-ns *ns*)]
+                     (create-entry-points '~entry-points)
                      (yagni/construct-reference-graph '~sources))
             problems# (check-graph find-children-and-parents graph#)]
         (if (seq problems#)

@@ -17,7 +17,10 @@
 (deftask test-yagni []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-yagni)))
+    (check/with-yagni)
+    (check/with-yagni :options {:entry-points ["test.with-yagni/-main"
+                                               "test.with-yagni/func-the-second"
+                                               42]})))
 
 (deftask test-eastwood []
   (set-env! :source-paths #{"src" "test"})

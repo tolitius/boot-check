@@ -37,13 +37,11 @@
 (deftask with-yagni
   "Static code analyzer for Clojure that helps you find unused code in your applications and libraries.
 
-  This task will run all the yagni checks within a pod.
-
-  At the moment it takes no arguments, but behold..! it will."
-  []
+  This task will run all the yagni checks within a pod."
+  [o options OPTIONS edn "yagni options edn map"]
   (let [pod-pool (make-pod-pool (concat pod-deps yagni-deps) bootstrap)]
     (core/with-pre-wrap fileset
-      (yagni/check pod-pool fileset) ;; TODO with args
+      (yagni/check pod-pool fileset options)
       fileset)))
 
 (deftask with-eastwood
