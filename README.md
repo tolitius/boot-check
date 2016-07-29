@@ -16,6 +16,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From Command Line](#from-command-line-1)
   - [From within "build.boot"](#from-within-buildboot-1)
   - [Help](#help-1)
+  - [Yagni entry points](#yagni-entry-points)
 - [Eastwood](#eastwood)
   - [From Command Line](#from-command-line-2)
   - [From within "build.boot"](#from-within-buildboot-2)
@@ -176,11 +177,22 @@ Static code analyzer for Clojure that helps you find unused code in your applica
 
 This task will run all the yagni checks within a pod.
 
-At the moment it takes no arguments, but behold..! it will.
-
 Options:
-  -h, --help  Print this help info.
+  -h, --help             Print this help info.
+  -o, --options OPTIONS  OPTIONS sets yagni options edn map.
 ```
+
+#### Yagni entry points
+
+Yagni works by searching your codebase from an initial set of entrypoints. As libraries, multi-main programs, and certain other types of projects either tend to have no `:main` or many entrypoint methods, you can instead, optionally, enumerate a `list of entrypoints` for your project in options:
+
+```clojure
+(check/with-yagni :options {:entry-points ["test.with-yagni/-main"
+                                           "test.with-yagni/func-the-second"
+                                           42]})))
+```
+
+check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L21-L23) in the `boot.build` of this project.
 
 ## Eastwood
 
