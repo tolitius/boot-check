@@ -330,6 +330,12 @@ Bikeshed takes a couple of options:
                                :max-line-length 42})
 ```
 
+or
+
+```
+$ boot check/with-bikeshed -o '{:max-line-length 4}'
+```
+
 check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L34-L35) in the boot.build of this project.
 
 ## Demo
