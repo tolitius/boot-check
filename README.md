@@ -25,6 +25,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From Command Line](#from-command-line-2)
   - [From within "build.boot"](#from-within-buildboot-2)
   - [Help](#help-2)
+  - [Bikeshed options](#bikeshed-options)
 - [Demo](#demo)
 - [License](#license)
 
@@ -179,7 +180,7 @@ This task will run all the yagni checks within a pod.
 
 Options:
   -h, --help             Print this help info.
-  -o, --options OPTIONS  OPTIONS sets yagni options edn map.
+  -o, --options OPTIONS  OPTIONS sets yagni options EDN map.
 ```
 
 #### Yagni entry points
@@ -316,8 +317,20 @@ This task will run all the bikeshed checks within a pod.
 At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-length', etc.)
 
 Options:
-  -h, --help  Print this help info.
+  -h, --help             Print this help info.
+  -o, --options OPTIONS  OPTIONS sets bikeshed options EDN map.
 ```
+
+### Bikeshed Options
+
+Bikeshed takes a couple of options:
+
+```clojure
+(check/with-bikeshed :options {:verbose true
+                               :max-line-length 42})
+```
+
+check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L34-L35) in the boot.build of this project.
 
 ## Demo
 

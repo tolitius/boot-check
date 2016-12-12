@@ -1,6 +1,6 @@
 (ns tolitius.checker.bikeshed
   (:require [tolitius.boot.helper :refer :all]
-            [boot.pod  :as pod]))
+            [boot.pod :as pod]))
 
 (def bikeshed-deps
   '[[lein-bikeshed "0.2.0" :exclusions [org.clojure/tools.cli 
@@ -12,7 +12,7 @@
       (require '[bikeshed.core])
       (let [sources# ~(tmp-dir-paths fileset)
             _ (boot.util/dbug (str "bikeshed is about to look at: -- " sources# " --"))
-            problems# (apply bikeshed.core/bikeshed {:source-paths sources#} ~args)]
+            problems# (apply bikeshed.core/bikeshed {:source-paths sources#} [~@args])]
         (if problems#
           (boot.util/warn (str "\nWARN: bikeshed found some problems ^^^ \n"))
           (boot.util/info "\nlatest report from bikeshed.... [You Rock!]\n"))))))

@@ -38,7 +38,7 @@
   "Static code analyzer for Clojure that helps you find unused code in your applications and libraries.
 
   This task will run all the yagni checks within a pod."
-  [o options OPTIONS edn "yagni options edn map"]
+  [o options OPTIONS edn "yagni options EDN map"]
   (let [pod-pool (make-pod-pool (concat pod-deps yagni-deps) bootstrap)]
     (core/with-pre-wrap fileset
       (yagni/check pod-pool fileset options)
@@ -64,8 +64,8 @@
 
   At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-length', etc.)"
   ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
-  []
+  [o options OPTIONS edn "bikeshed options EDN map"]
   (let [pod-pool (make-pod-pool (concat pod-deps bikeshed-deps) bootstrap)]
     (core/with-pre-wrap fileset
-      (bikeshed/check pod-pool fileset) ;; TODO with args
+      (bikeshed/check pod-pool fileset options) ;; TODO with args
       fileset)))
