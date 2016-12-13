@@ -46,5 +46,7 @@
                      (yagni/construct-reference-graph '~sources))
             problems# (check-graph find-children-and-parents graph#)]
         (if (seq problems#)
-          (report problems#)
+          (do
+            (report problems#)
+            {:errors problems#})
           (boot.util/info "\nlatest report from yagni.... [You Rock!]\n"))))))

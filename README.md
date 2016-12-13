@@ -26,6 +26,11 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [From within "build.boot"](#from-within-buildboot-2)
   - [Help](#help-2)
   - [Bikeshed options](#bikeshed-options)
+- [Handling Errors](#handling-errors)
+  - [Kibit Exceptions](#kibit-exceptions)
+  - [Yagni Exceptions](#yagni-exceptions)
+  - [Eastwood Exceptions](#eastwood-exceptions)
+  - [Bikeshed Exceptions](#bikeshed-exceptions)
 - [Demo](#demo)
 - [License](#license)
 
@@ -121,6 +126,7 @@ At the moment it takes no arguments, but behold..! it will. (files, rules, repor
 
 Options:
   -h, --help  Print this help info.
+  -t, --throw-on-errors  throw an exception if the check does not pass
 ```
 
 ## Yagni
@@ -181,6 +187,7 @@ This task will run all the yagni checks within a pod.
 Options:
   -h, --help             Print this help info.
   -o, --options OPTIONS  OPTIONS sets yagni options EDN map.
+  -t, --throw-on-errors  throw an exception if the check does not pass
 ```
 
 #### Yagni entry points
@@ -246,6 +253,7 @@ At the moment it takes no arguments, but behold..! it will. (linters, namespaces
 
 Options:
   -h, --help  Print this help info.
+  -t, --throw-on-errors  throw an exception if the check does not pass
 ```
 
 ## Bikeshed
@@ -319,6 +327,7 @@ At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-len
 Options:
   -h, --help             Print this help info.
   -o, --options OPTIONS  OPTIONS sets bikeshed options EDN map.
+  -t, --throw-on-errors  throw an exception if the check does not pass
 ```
 
 ### Bikeshed Options
@@ -337,6 +346,86 @@ $ boot check/with-bikeshed -o '{:max-line-length 4}'
 ```
 
 check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L34-L35) in the boot.build of this project.
+
+## Handling Errors
+
+All tasks (i.e. for kibit, yagni, eastwood, bikeshed, etc.) accept an optional flag:
+
+```
+-t, --throw-on-errors  throw an exception if the check does not pass
+```
+
+that if set will report all the problems found with the task, and then throw an exception.
+
+Here are some examples:
+
+```clojure
+boot.user=> (set-env! :source-paths #{"src" "test"})
+```
+
+### Kibit Exceptions
+
+```clojure
+boot.user=> (boot (check/with-kibit "-t"))
+ ... reporting problems here then throws:
+
+clojure.lang.ExceptionInfo: kibit checks fail
+
+boot.user=> *e
+#error {
+ :cause "kibit checks fail"
+ :data {:causes ({:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)} {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)})}
+ ...}
+```
+
+### Yagni Exceptions
+
+```clojure
+boot.user=> (boot (check/with-yagni "-t"))
+ ... reporting problems here then throws:
+
+clojure.lang.ExceptionInfo: yagni checks fail
+
+boot.user=> *e
+#error {
+ :cause "yagni checks fail"
+ :data {:causes {:no-refs #{tolitius.boot-check/with-eastwood test.with-yagni/other-func tolitius.boot-check/with-yagni tolitius.boot-check/with-bikeshed tolitius.boot-check/with-kibit test.with-eastwood/nested-def test.with-kibit/vec-vs-into test.with-eastwood/always-true}, :no-parent-refs #{tolitius.boot.helper/make-pod-pool tolitius.boot.helper/fileset->paths tolitius.checker.yagni/yagni-deps tolitius.checker.yagni/entry-points-file tolitius.checker.bikeshed/bikeshed-deps tolitius.checker.yagni/create-entry-points test.with-kibit/when-vs-if tolitius.checker.yagni/check tolitius.checker.yagni/pp tolitius.boot.helper/tmp-dir-paths test.with-eastwood/a tolitius.checker.yagni/report tolitius.checker.yagni/check-graph tolitius.checker.kibit/kibit-deps tolitius.checker.eastwood/check tolitius.checker.kibit/check tolitius.boot-check/pod-deps tolitius.boot-check/with-throw test.with-yagni/func tolitius.checker.bikeshed/check tolitius.checker.eastwood/eastwood-deps tolitius.boot-check/bootstrap}}}
+ ...}
+```
+
+
+### Eastwood Exceptions
+
+```clojure
+boot.user=> (boot (check/with-eastwood "-t"))
+ ... reporting problems here then throws:
+
+clojure.lang.ExceptionInfo: eastwood checks fail
+
+boot.user=> *e
+#error {
+ :cause "eastwood checks fail"
+ :data {:causes {:err nil, :warning-count 12, :exception-count 0}}
+ ...}
+```
+
+In case of Eastwood warnings are not returned, just their number of them. They are however reported (printed) as found.
+
+### Bikeshed Exceptions
+
+```clojure
+boot.user=> (boot (check/with-bikeshed "-t"))
+ ... reporting problems here then throws:
+
+boot.user=> *e
+#error {
+ :cause "bikeshed checks fail"
+ :data {:causes true}
+ ...}
+```
+
+In case of Bikeshed, no errors / warnings are retured, since it just its internal checks return true/false values. But the exception is raised nevertheless
+to indicate that some checks have failed.
 
 ## Demo
 

@@ -20,5 +20,7 @@
       (doseq [ns '~namespaces] (require ns))
       (let [problems# (apply kibit.driver/run '~sources nil '~args)]   ;; nil for "rules" which would expand to all-rules,
         (if-not (zero? (count problems#))
-          (boot.util/warn (str "\nWARN: kibit found some problems: \n\n" {:problems (set problems#)} "\n"))
+          (do
+            (boot.util/warn (str "\nWARN: kibit found some problems: \n\n" {:problems (set problems#)} "\n"))
+            {:errors problems#})
           (boot.util/info "\nlatest report from kibit.... [You Rock!]\n"))))))

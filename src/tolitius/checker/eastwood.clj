@@ -12,9 +12,12 @@
       ;; ~(boot.core/load-data-readers!)
       (let [sources# #{~@(tmp-dir-paths fileset)}
             _ (boot.util/dbug (str "eastwood is about to look at: -- " sources# " --"))
-            {:keys [some-warnings]} (eastwood/eastwood {:source-paths sources#
-                                                        ;; :debug #{:ns}
-                                                        })]
+            {:keys [some-warnings] :as checks} (eastwood/eastwood {:source-paths sources#
+                                                                   ;; :debug #{:ns}
+                                                                   })]
         (if some-warnings
-          (boot.util/warn (str "\nWARN: eastwood found some problems ^^^ \n\n"))
+          (do
+            (boot.util/warn (str "\nWARN: eastwood found some problems ^^^ \n\n"))
+            {:errors (eastwood/eastwood-core (eastwood/last-options-map-adjustments  ;; TODO rerun to get the actual errors, but otherwise need to rewrite eastwood/eastwood
+                                               {:source-paths sources#}))})
           (boot.util/info "\nlatest report from eastwood.... [You Rock!]\n"))))))

@@ -14,5 +14,7 @@
             _ (boot.util/dbug (str "bikeshed is about to look at: -- " sources# " --"))
             problems# (apply bikeshed.core/bikeshed {:source-paths sources#} [~@args])]
         (if problems#
-          (boot.util/warn (str "\nWARN: bikeshed found some problems ^^^ \n"))
+          (do
+            (boot.util/warn (str "\nWARN: bikeshed found some problems ^^^ \n"))
+            {:errors problems#})
           (boot.util/info "\nlatest report from bikeshed.... [You Rock!]\n"))))))
