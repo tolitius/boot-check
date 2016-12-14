@@ -3,7 +3,7 @@
             [boot.pod :as pod]))
 
 (def bikeshed-deps
-  '[[lein-bikeshed "0.2.0" :exclusions [org.clojure/tools.cli 
+  '[[lein-bikeshed "0.4.1" :exclusions [org.clojure/tools.cli 
                                         org.clojure/tools.namespace]]])
 
 (defn check [pod-pool fileset & args]

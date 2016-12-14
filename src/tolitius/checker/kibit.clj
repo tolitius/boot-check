@@ -4,7 +4,7 @@
             [boot.pod  :as pod]))
 
 (def kibit-deps
-  '[[jonase/kibit "0.1.2"]
+  '[[jonase/kibit "0.1.3"]
     [org.clojure/tools.cli "0.3.3"]])
 
 (defn check [pod-pool fileset & args]
