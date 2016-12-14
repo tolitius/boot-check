@@ -424,8 +424,7 @@ boot.user=> *e
  ...}
 ```
 
-In case of Bikeshed, no errors / warnings are retured, since it just its internal checks return true/false values. But the exception is raised nevertheless
-to indicate that some checks have failed.
+In case of Bikeshed, no errors / warnings are retured, since its own internal checks just return true/false values. But the exception is raised nevertheless to indicate that some checks have failed.
 
 ## Demo
 
@@ -433,7 +432,7 @@ Here is a boot check [demo project](https://github.com/tolitius/check-boot-check
 
 ## License
 
-Copyright © 2015 toliitus
+Copyright © 2016 toliitus
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
