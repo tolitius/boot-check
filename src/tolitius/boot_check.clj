@@ -65,7 +65,7 @@
   [t throw-on-errors bool "throw an exception if the check does not pass"]
   (let [pod-pool (make-pod-pool (concat pod-deps eastwood-deps) bootstrap)]
     (core/with-pre-wrap fileset
-      (with-throw #(eastwood/check pod-pool fileset)         ;; TODO with args
+      (with-throw #(eastwood/check pod-pool fileset [:unused-ret-vals])         ;; TODO with args
                   "eastwood checks fail"
                   throw-on-errors)
       fileset)))
