@@ -13,7 +13,7 @@
       (let [sources# #{~@(tmp-dir-paths fileset)}
             _ (boot.util/dbug (str "eastwood is about to look at: -- " sources# " --"))
             {:keys [some-warnings] :as checks} (eastwood/eastwood {:source-paths sources#
-                                                                   :exclude-linters exclude-linters
+                                                                   :exclude-linters ~exclude-linters
                                                                    ;; :debug #{:ns}
                                                                    })]
         (if some-warnings
