@@ -5,14 +5,16 @@
 (def eastwood-deps
   '[[jonase/eastwood "0.2.4" :exclusions [org.clojure/clojure]]])
 
-(defn check [pod-pool fileset & args]
-  (let [worker-pod (pod-pool :refresh)]
+(defn check [pod-pool fileset options & args]
+  (let [worker-pod (pod-pool :refresh)
+        exclude-linters (:exclude-linters options)]
     (pod/with-eval-in worker-pod
       (require '[eastwood.lint :as eastwood])
       ;; ~(boot.core/load-data-readers!)
       (let [sources# #{~@(tmp-dir-paths fileset)}
             _ (boot.util/dbug (str "eastwood is about to look at: -- " sources# " --"))
             {:keys [some-warnings] :as checks} (eastwood/eastwood {:source-paths sources#
+                                                                   :exclude-linters ~exclude-linters
                                                                    ;; :debug #{:ns}
                                                                    })]
         (if some-warnings

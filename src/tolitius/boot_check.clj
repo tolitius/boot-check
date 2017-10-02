@@ -62,10 +62,11 @@
 
   At the moment it takes no arguments, but behold..! it will. (linters, namespaces, etc.)"
   ;; [f files FILE #{sym} "the set of files to check."]      ;; TODO: convert these to "tmp-dir/file"
-  [t throw-on-errors bool "throw an exception if the check does not pass"]
+  [o options OPTIONS edn "eastwood options EDN map"
+   t throw-on-errors bool "throw an exception if the check does not pass"]
   (let [pod-pool (make-pod-pool (concat pod-deps eastwood-deps) bootstrap)]
     (core/with-pre-wrap fileset
-      (with-throw #(eastwood/check pod-pool fileset)         ;; TODO with args
+      (with-throw #(eastwood/check pod-pool fileset options)
                   "eastwood checks fail"
                   throw-on-errors)
       fileset)))

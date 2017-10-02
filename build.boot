@@ -25,7 +25,7 @@
 (deftask test-eastwood []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-eastwood)))
+    (check/with-eastwood :options {:exclude-linters [:unused-ret-vals]})))
 
 (deftask test-bikeshed []
   (set-env! :source-paths #{"src" "test"})
