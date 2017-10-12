@@ -3,7 +3,7 @@
             [boot.pod  :as pod]))
 
 (def eastwood-deps
-  '[[jonase/eastwood "0.2.4" :exclusions [org.clojure/clojure]]])
+  '[[jonase/eastwood "0.2.5" :exclusions [org.clojure/clojure]]])
 
 (defn check [pod-pool fileset options & args]
   (let [worker-pod (pod-pool :refresh)
