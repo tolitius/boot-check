@@ -1,4 +1,4 @@
-(def +version+ "0.1.5")
+(def +version+ "0.1.7")
 
 (set-env!
   :source-paths #{"src"}
@@ -31,7 +31,8 @@
   (set-env! :source-paths #{"src" "test"})
   (comp
     (check/with-bikeshed)
-    (check/with-bikeshed :options {:verbose true
+    (check/with-bikeshed :options {:check? #{:long-lines :trailing-whitespace :var-redefs :bad-methods :name-collisions}
+                                   :verbose true
                                    :max-line-length 42})))
 
 (deftask check-all []

@@ -2,7 +2,7 @@
 
 [Boot](https://github.com/boot-clj/boot) tasks to check, analyze and inspect Clojure/Script code.
 
-It relies on universe tested [kibit](https://github.com/jonase/kibit), 
+It relies on universe tested [kibit](https://github.com/jonase/kibit),
 [eastwood](https://github.com/jonase/eastwood), [yagni](https://github.com/venantius/yagni), [bikeshed](https://github.com/dakrone/lein-bikeshed) and other titans.
 
 [![Clojars Project](http://clojars.org/tolitius/boot-check/latest-version.svg)](http://clojars.org/tolitius/boot-check)
@@ -97,7 +97,7 @@ instead of:
 
 WARN: kibit found some problems:
 
-{:problems #{{:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)} 
+{:problems #{{:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)}
              {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)}}}
 ```
 
@@ -322,8 +322,6 @@ This task is backed by 'lein-bikeshed' which is designed to tell you your code i
 
 This task will run all the bikeshed checks within a pod.
 
-At the moment it takes no arguments, but behold..! it will. ('-m, --max-line-length', etc.)
-
 Options:
   -h, --help             Print this help info.
   -o, --options OPTIONS  OPTIONS sets bikeshed options EDN map.
@@ -332,20 +330,21 @@ Options:
 
 ### Bikeshed Options
 
-Bikeshed takes a couple of options:
+Bikeshed takes some options:
 
 ```clojure
-(check/with-bikeshed :options {:verbose true
+(check/with-bikeshed :options {:check? #{:long-lines}
+                               :verbose true
                                :max-line-length 42})
 ```
 
 or
 
 ```
-$ boot check/with-bikeshed -o '{:max-line-length 4}'
+$ boot check/with-bikeshed -o '{:check? #{:long-lines :trailing-whitespace :var-redefs :bad-methods :name-collisions}}'
 ```
 
-check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L34-L35) in the boot.build of this project.
+check out the [example](https://github.com/tolitius/boot-check/blob/master/build.boot#L34-L36) in the boot.build of this project.
 
 ## Handling Errors
 
