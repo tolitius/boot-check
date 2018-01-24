@@ -1,5 +1,5 @@
 ## 1.0.7
-###### Wed Jan 24 18:08:53 2018 -0500 / 2e625e1
+###### Wed Jan 24 18:08:53 2018 -0500
 
 * updating bikeshed to 0.5.1 ([#16](https://github.com/tolitius/boot-check/issues/16))
   - bikeshed options changed, it now requires `:check?` option to include possible checks:

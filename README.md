@@ -320,7 +320,7 @@ $ boot check/with-bikeshed -h
 
 This task is backed by 'lein-bikeshed' which is designed to tell you your code is bad, and that you should feel bad
 
-This task will run all the bikeshed checks within a pod.
+This task will run bikeshed checks within a pod.
 
 Options:
   -h, --help             Print this help info.
