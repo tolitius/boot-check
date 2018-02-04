@@ -3,7 +3,9 @@
 (set-env!
   :source-paths #{"src"}
   :dependencies '[[boot/core              "2.7.2"]
-                  [adzerk/bootlaces       "0.1.13"          :scope "test"]])
+                  [adzerk/bootlaces       "0.1.13"          :scope "test"]
+                  [hiccup                 "1.0.5"]])
+
 
 (require '[tolitius.boot-check :as check]
          '[adzerk.bootlaces :refer :all]
@@ -52,4 +54,3 @@
        :scm         {:url "https://github.com/tolitius/boot-check"}
        :license     {"Eclipse Public License"
                      "http://www.eclipse.org/legal/epl-v10.html"}})
-

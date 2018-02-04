@@ -1,6 +1,7 @@
 (ns tolitius.checker.yagni
   (:require [boot.pod :as pod]
             [tolitius.boot.helper :refer :all]
+            [tolitius.core.check :as ch]
             [clojure.string :as s]))
 
 (def yagni-deps
@@ -12,11 +13,22 @@
 (defn- pp [s]
   (s/join "\n" s))
 
+(defn- namespace->file [namespace]
+  (-> (clojure.string/replace (str namespace) #"\." "\\\\")
+      (clojure.string/replace #"/.*" ".clj")))
+
+(defn- error-desc [family varname]
+  (cond
+    (= family :no-refs) (str  "Could not find any reference to Var " varname)
+    (= family :no-parent-refs) (str "Var " varname " is referenced by unused code")))
+
+(defn to-issue [namespace family]
+  (ch/issue :yagni family (error-desc family (str namespace)) (ch/coords (namespace->file namespace) 0 0) nil))
+
 (defn check-graph [find-family g]
   (let [{:keys [children parents]} (find-family @g)]
-    (cond-> {}
-      (seq parents) (assoc :no-refs (set parents))
-      (seq children) (assoc :no-parent-refs (set children)))))
+    (concat (mapv #(to-issue % :no-parent-refs) (vec children))
+            (mapv #(to-issue % :no-refs) (vec parents)))))
 
 (defn report [{:keys [no-refs no-parent-refs]}]
   (when no-refs
@@ -35,7 +47,7 @@
         sources (fileset->paths fileset)]
     (pod/with-eval-in worker-pod
       (boot.util/dbug (str "yagni is about to look at: -- " '~sources " --"
-                        (if '~entry-points 
+                        (if '~entry-points
                           (str "\nwith entry points -- " '~entry-points " --")
                           "\nwith no entry points")))
       (require '[yagni.core :as yagni]
@@ -45,8 +57,7 @@
                      (create-entry-points '~entry-points)
                      (yagni/construct-reference-graph '~sources))
             problems# (check-graph find-children-and-parents graph#)]
-        (if (seq problems#)
-          (do
-            (report problems#)
-            {:errors problems#})
-          (boot.util/info "\nlatest report from yagni.... [You Rock!]\n"))))))
+        (if problems#
+          (boot.util/info "\nlatest report from yagni.... Yagni found some problems!\n")
+          (boot.util/info "\nlatest report from yagni.... [You Rock!]\n"))
+        {:warnings (or problems# [])}))))
