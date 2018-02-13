@@ -18,7 +18,7 @@
 (def pod-deps
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
-(defn store-tmp-file [fileset tmpdir content filename]
+(defn- store-tmp-file [fileset tmpdir content filename]
   (core/empty-dir! tmpdir)
   (let [content-file (io/file tmpdir filename)]
     (doto content-file
@@ -27,17 +27,17 @@
     (let [new (core/add-source fileset tmpdir)]
       (core/commit! new))))
 
-(defn load-issues [fileset]
+(defn- load-issues [fileset]
   (if-let [issues (->> fileset core/input-files (core/by-name [interim-report-data-file]) first)]
     (read-string (-> issues core/tmp-file slurp))
     []))
 
-(defn append-issues [fileset tmpdir issues]
+(defn- append-issues [fileset tmpdir issues]
   (let [content (concat (load-issues fileset) issues)
         str-content (pr-str content)]
     (store-tmp-file fileset tmpdir str-content interim-report-data-file)))
 
-(defn write-report [fileset tmpdir report]
+(defn- write-report [fileset tmpdir report]
   (store-tmp-file fileset tmpdir report final-report-file-name))
 
 (defn- do-report [fileset tmpdir issues options]
@@ -66,7 +66,9 @@
     (when throw?
       (boot.util/warn-deprecated (str "\nWARN: throw-on-errors OPTION should be replaced by adding throw-on-errors TASK at the end of pipeline!^^^ \n"))
       (throw (ex-info msg {:causes warnings})))
-    (do-report fileset tmpdir warnings options)))
+    (if (true? (:gen-report options))
+      (do-report fileset tmpdir warnings options)
+      fileset)))
 
 (deftask with-kibit
   "Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.

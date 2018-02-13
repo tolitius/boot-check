@@ -17,24 +17,30 @@
 (deftask test-kibit []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-kibit)))
+    (check/with-kibit :options {:gen-report true})))
 
 (deftask test-yagni []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-yagni :options {:entry-points ["test.with-yagni/-main"
+    (check/with-yagni :options {:gen-report true
+                                :entry-points ["test.with-yagni/-main"
                                                "test.with-yagni/func-the-second"
                                                42]})))
 
 (deftask test-eastwood []
   (set-env! :source-paths #{"src" "test"} :boot-check-reporter :html)
   (comp
+    (check/with-eastwood :options {:gen-report true :exclude-linters [:unused-ret-vals]})))
+
+(deftask test-eastwood-no-report []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
     (check/with-eastwood :options {:exclude-linters [:unused-ret-vals]})))
 
 (deftask test-eastwood-and-throw []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-eastwood :options {:exclude-linters [:unused-ret-vals]})
+    (check/with-eastwood :options {:gen-report true :exclude-linters [:unused-ret-vals]})
     (check/throw-on-errors)))
 
 (deftask test-bikeshed []
@@ -43,7 +49,8 @@
     (check/with-bikeshed)
     (check/with-bikeshed :options {:check? #{:long-lines :trailing-whitespace :var-redefs :bad-methods :name-collisions}
                                    :verbose true
-                                   :max-line-length 42})))
+                                   :max-line-length 42
+                                   :gen-report true})))
 
 (deftask check-all []
   (comp
