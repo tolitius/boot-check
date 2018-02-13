@@ -357,8 +357,6 @@ All tasks (i.e. for kibit, yagni, eastwood, bikeshed, etc.) accept an optional f
 
 that if set will report all the problems found with the task, and then throw an exception.
 
-For some cases when You want to handle exceptions for all code checkers used in your boot pipeline (not stop after first exception) You can use task called 'throw-on-errors'. This is because when using flag on particular checker task - exception will be thrown and pipeline will be not continued. This is not perfect approach as long as You still may want to report all errors from other 'pending' checkers. Task 'throw-on-errors' provided at the end of the pipeline will take all possible issues (persisted as part of boot input files) and throw exception which contains those issues under :causes map key. So by using 'throw-on-errors' task You can get all errors aggregated in single exception, and You are not preventing pipeline execution until You use that task - so You can achieve reporting for all checkers If You wish, and after that throw aggregated exception.
-
 Here are some examples:
 
 ```clojure
@@ -374,10 +372,10 @@ boot.user=> (boot (check/with-kibit "-t"))
 clojure.lang.ExceptionInfo: kibit checks fail
 
 boot.user=> *e
-#error {
+#error {}
  :cause "kibit checks fail"
  :data {:causes ({:expr (if 42 42 nil), :line 4, :column 3, :alt (when 42 42)} {:expr (into [] 42), :line 7, :column 3, :alt (vec 42)})}
- ...}
+ ...
 ```
 
 ### Yagni Exceptions
@@ -389,10 +387,10 @@ boot.user=> (boot (check/with-yagni "-t"))
 clojure.lang.ExceptionInfo: yagni checks fail
 
 boot.user=> *e
-#error {
+#error {}
  :cause "yagni checks fail"
  :data {:causes {:no-refs #{tolitius.boot-check/with-eastwood test.with-yagni/other-func tolitius.boot-check/with-yagni tolitius.boot-check/with-bikeshed tolitius.boot-check/with-kibit test.with-eastwood/nested-def test.with-kibit/vec-vs-into test.with-eastwood/always-true}, :no-parent-refs #{tolitius.boot.helper/make-pod-pool tolitius.boot.helper/fileset->paths tolitius.checker.yagni/yagni-deps tolitius.checker.yagni/entry-points-file tolitius.checker.bikeshed/bikeshed-deps tolitius.checker.yagni/create-entry-points test.with-kibit/when-vs-if tolitius.checker.yagni/check tolitius.checker.yagni/pp tolitius.boot.helper/tmp-dir-paths test.with-eastwood/a tolitius.checker.yagni/report tolitius.checker.yagni/check-graph tolitius.checker.kibit/kibit-deps tolitius.checker.eastwood/check tolitius.checker.kibit/check tolitius.boot-check/pod-deps tolitius.boot-check/with-throw test.with-yagni/func tolitius.checker.bikeshed/check tolitius.checker.eastwood/eastwood-deps tolitius.boot-check/bootstrap}}}
- ...}
+ ...
 ```
 
 
@@ -405,10 +403,10 @@ boot.user=> (boot (check/with-eastwood "-t"))
 clojure.lang.ExceptionInfo: eastwood checks fail
 
 boot.user=> *e
-#error {
+#error {}
  :cause "eastwood checks fail"
  :data {:causes {:err nil, :warning-count 12, :exception-count 0}}
- ...}
+ ...
 ```
 
 In case of Eastwood warnings are not returned, just their number of them. They are however reported (printed) as found.
@@ -420,25 +418,29 @@ boot.user=> (boot (check/with-bikeshed "-t"))
  ... reporting problems here then throws:
 
 boot.user=> *e
-#error {
+#error {}
  :cause "bikeshed checks fail"
  :data {:causes true}
- ...}
+ ...
 ```
 
 In case of Bikeshed, no errors / warnings are retured, since its own internal checks just return true/false values. But the exception is raised nevertheless to indicate that some checks have failed.
 
+### Aggregated Exceptions Handling
+
+For some cases when You want to throw exception containing warnings reported by all checkers (and do not stop after first checker reports errors) You can use task called 'throw-on-errors'. Throwing exception in the middle of the pipeline by single checker is not perfect approach as long as You still may want to report  errors from other 'pending' checkers. To overcome this issue - just place 'throw-on-errors' at the end of the boot pipeline. By following that approach You will throw exception once with all possible errors aggregated during entire pipeline execution.
+
 ## Reporting
 
-As long as standard console output may be sometimes difficult to read - boot-check provides :gen-report option which will force specific checker task to report its warnings. All checker tasks with this option set to true will dump all found issues by appending them into shared interim warnings file. After that, file content will be loaded again and report will be generated. Boot-check allows plugging of new reporters. This can be done by implementing following multimethod:
+As long as standard console output may be sometimes difficult to read - boot-check provides :gen-report option which forces particular checker task to report its warnings. All checkers with this option set to true will dump found issues by appending them into shared interim warnings file. Then file content will be loaded again and report will be generated. Boot-check allows plugging of new reporters. This can be done by implementing following multimethod:
 
 ```clojure
 (defmethod tolitius.core.reporting/report :your-own-generator [issues options])
 ```
 
-After providing source code with custom report generator implementation, a namespace must be evaluated.
+After providing source code with custom report generator a namespace containing that generator must be evaluated.
 
-Below there is example on how to include checker task into reporting:
+Below there is example showing how to include checker task into reporting:
 ```clojure
 (check/with-kibit :options {:gen-report :true})
 ```
@@ -449,7 +451,7 @@ and how to override default html report generator:
   (check/with-kibit :options {:gen-report :true}))
 ```
 
-A typical pipeline with reporting enabled (and additional throw-on-errors task) can look like:
+A typical pipeline with reporting enabled (and additional throw-on-errors task) can look like this:
 
 ```clojure
 (deftask check-with-report []
@@ -463,22 +465,21 @@ A typical pipeline with reporting enabled (and additional throw-on-errors task) 
 ```
 
 ### Report samples
-And this is how reports look like :
+Take a look at how reports look like.
 
--This is report grid:
+#### Report grid view
 
 ![alt text](screen-1.png)
 
--And this is details view - currently only snippet is showing in here.
+#### Issue details view (currently only code snippet is showing in here.)
 
 ![alt text](screen-2.png)
 
 ### Report limitations
+
 Due to implementation details of some of checkers (bikeshed, kibit) some limitations exists regarding amount of information visible on report.
-- kibit currently does not return filenames, which makes it impossible to include it in the report (only stdout directly from kibit reports filenames :( )
+- kibit currently does not return filenames, which makes it impossible to include it in the report (only stdout directly from kibit reports filenames :())
 - bikeshed does not return issue details at all - it only returns some summary containing list of tests which has not passed. Because of that - reports only contain that summary for know for bikeshed.
-
-
 
 ## Demo
 
@@ -488,5 +489,5 @@ Here is a boot check [demo project](https://github.com/tolitius/check-boot-check
 
 Copyright © 2016 toliitus
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License either version 1.0 or (at)
+your option any later version.
