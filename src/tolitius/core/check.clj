@@ -21,7 +21,7 @@
    (issue linter category key message coords severity snippet issue-form nil))
   ([linter category key message coords severity snippet issue-form hint-form]
    {:id (str (java.util.UUID/randomUUID))
-    :linter linter
+    :linter-tool linter
     :category category
     :key key
     :severity severity

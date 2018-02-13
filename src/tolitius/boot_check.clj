@@ -13,6 +13,8 @@
 
 (def ^:const interim-report-data-file "interim-data")
 
+(def ^:const final-report-file-name "report.html")
+
 (def pod-deps
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
@@ -36,16 +38,18 @@
     (store-tmp-file fileset tmpdir str-content interim-report-data-file)))
 
 (defn write-report [fileset tmpdir report]
-  (store-tmp-file fileset tmpdir report "report.html"))
+  (store-tmp-file fileset tmpdir report final-report-file-name))
 
 (defn- do-report [fileset tmpdir issues options]
-  (if (not (nil? (:reporter options)))
+  (if-let [reporter (core/get-env :boot-check-reporter :html)]
     (let [fileset (append-issues fileset tmpdir issues)
-          refreshed (load-issues fileset)]
-      (let [report-content (r/report refreshed options)]
-        (boot.util/info "\nGenerating report...\n")
-        (write-report fileset tmpdir report-content)))
-    fileset))    
+          refreshed (load-issues fileset)
+          report-content (r/report refreshed (assoc options :reporter reporter))]
+        (boot.util/info "\nWriting report to current directory...\n")
+        (spit final-report-file-name report-content)
+        (boot.util/info "\nWriting report to boot fileset TEMP directory...\n")
+        (write-report fileset tmpdir report-content))
+    fileset))
 
 (defn bootstrap [fresh-pod]
   (doto fresh-pod
@@ -57,7 +61,7 @@
      (defn all-ns* [& dirs]
        (distinct (mapcat #(find-namespaces-in-dir (io/file %)) dirs))))))
 
-(defn with-report [fileset tmpdir f msg throw? options]
+(defn- process-results [fileset tmpdir f msg throw? options]
   (when-let [{:keys [warnings]} (f)]
     (when throw?
       (boot.util/warn-deprecated (str "\nWARN: throw-on-errors OPTION should be replaced by adding throw-on-errors TASK at the end of pipeline!^^^ \n"))
@@ -76,10 +80,10 @@
   (let [pod-pool (make-pod-pool (concat pod-deps kibit-deps) bootstrap)
         tmpdir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (with-report fileset tmpdir
-                   #(kibit/check pod-pool fileset)          ;; TODO with args
-                   "kibit checks fail"
-                   throw-on-errors options))))
+      (process-results fileset tmpdir
+                       #(kibit/check pod-pool fileset)  ;; TODO with args
+                       "kibit checks fail"
+                       throw-on-errors options))))
 
 (deftask with-yagni
   "Static code analyzer for Clojure that helps you find unused code in your applications and libraries.
@@ -90,10 +94,10 @@
   (let [pod-pool (make-pod-pool (concat pod-deps yagni-deps) bootstrap)
         tmpdir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (with-report fileset tmpdir
-                   #(yagni/check pod-pool fileset options)  ;; TODO with args
-                   "yagni checks fail"
-                   throw-on-errors options))))
+      (process-results fileset tmpdir
+                       #(yagni/check pod-pool fileset options)  ;; TODO with args
+                       "yagni checks fail"
+                       throw-on-errors options))))
 
 (deftask with-eastwood
   "Clojure lint tool that uses the tools.analyzer and tools.analyzer.jvm libraries to inspect namespaces and report possible problems
@@ -107,10 +111,10 @@
   (let [pod-pool (make-pod-pool (concat pod-deps eastwood-deps) bootstrap)
         tmpdir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (with-report fileset tmpdir
-                   #(eastwood/check pod-pool fileset options)
-                   "eastwood checks fail"
-                   throw-on-errors options))))
+      (process-results fileset tmpdir
+                       #(eastwood/check pod-pool fileset options)
+                       "eastwood checks fail"
+                       throw-on-errors options))))
 
 (deftask with-bikeshed
   "This task is backed by 'lein-bikeshed' which is designed to tell you your code is bad, and that you should feel bad
@@ -124,7 +128,24 @@
   (let [pod-pool (make-pod-pool (concat pod-deps bikeshed-deps) bootstrap)
         tmpdir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (with-report fileset tmpdir
-                   #(bikeshed/check pod-pool fileset options)  ;; TODO with args
-                   "bikeshed checks fail"
-                   throw-on-errors options))))
+      (process-results fileset tmpdir
+                       #(bikeshed/check pod-pool fileset options)  ;; TODO with args
+                       "bikeshed checks fail"
+                       throw-on-errors options))))
+
+(deftask throw-on-errors
+  "This task provides caller with exception when some of code checkers reports warnings.
+
+  Using this task makes sense when You want to skip later tasks within the pipline as your
+
+  rigorous policy assumes every line of code to be perfect ;-)
+
+  When using this task You decide when to throw an exception. You may want to throw exception after
+
+  particular checker or after all checkers has completed"
+  []
+  (core/with-pre-wrap fileset
+    (when-let [issues (load-issues fileset)]
+      (when-not (empty? issues)
+        (throw (ex-info "Some of code checkers have failed." {:causes issues}))))
+    fileset))

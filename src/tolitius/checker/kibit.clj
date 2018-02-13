@@ -8,11 +8,10 @@
   '[[jonase/kibit "0.1.5"]
     [org.clojure/tools.cli "0.3.3"]])
 
-;;Kibit does not report file :(  - it is a bug.
+;;Kibit does not report file :(  - it is a bug. Next version of kibit will support that.
 (defn normalise-issue [warning]
-  (let [{:keys [expr alt line column]} warning
+  (let [{:keys [expr alt line column file]} warning
         msg (str "Consider changing [ " (pr-str expr) " ] with [ " (pr-str alt) " ]")
-        file "-"
         linter "kibit"]
     (ch/issue :kibit linter msg (ch/coords file line column) nil)))
 

@@ -4,12 +4,15 @@
   :source-paths #{"src"}
   :dependencies '[[boot/core              "2.7.2"]
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
-                  [hiccup                 "1.0.5"]])
+                  [hiccup                 "1.0.5"]
+                  [pandeiro/boot-http     "0.8.3"]])
 
 
 (require '[tolitius.boot-check :as check]
          '[adzerk.bootlaces :refer :all]
-         '[boot.util])
+         '[boot.util]
+         '[tolitius.reporter.html :refer :all]
+         '[pandeiro.boot-http :refer :all])
 
 (deftask test-kibit []
   (set-env! :source-paths #{"src" "test"})
@@ -19,15 +22,20 @@
 (deftask test-yagni []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-yagni)
     (check/with-yagni :options {:entry-points ["test.with-yagni/-main"
                                                "test.with-yagni/func-the-second"
                                                42]})))
 
 (deftask test-eastwood []
-  (set-env! :source-paths #{"src" "test"})
+  (set-env! :source-paths #{"src" "test"} :boot-check-reporter :html)
   (comp
     (check/with-eastwood :options {:exclude-linters [:unused-ret-vals]})))
+
+(deftask test-eastwood-and-throw []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-eastwood :options {:exclude-linters [:unused-ret-vals]})
+    (check/throw-on-errors)))
 
 (deftask test-bikeshed []
   (set-env! :source-paths #{"src" "test"})

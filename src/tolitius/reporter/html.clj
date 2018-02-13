@@ -72,34 +72,32 @@
 
 (defn- build [issues options]
   (html
-    [:head
-      [:link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"}]
-      [:link {:rel "stylesheet" :href "https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css"}]
-      [:script {:src "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"}]
-      [:script {:src "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"}]
-      [:script {:src "https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"}]
-      [:script {:src "https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"}]
-      [:script  "$(document).ready(function() {$('#issuestable').DataTable();});"]]
-
-    [:body
-      (report-header)
-      [:h5 {:class "p-3"} "All reported warnings:"]
-      [:div {:class "container-fluid"}
-        (snippets issues)
-        [:div {:id "responsive-wrapper" :class "table-responsive"}
-          [:table {:id "issuestable" :role "grid" :class "table table-sm table-striped table-hover table-bordered"}
-            [:thead
-              [:th "Tool"]
-              [:th "Type"]
-              [:th "Message"]
-              [:th "File"]
-              [:th "Location"]
-              [:th "Severity"]
-              [:th "See Details"]]
-            (reduce insert-rows [:tbody] issues)]]]]))
+    [:html
+      [:head
+        [:link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"}]
+        [:link {:rel "stylesheet" :href "https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css"}]
+        [:script {:src "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"}]
+        [:script {:src "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"}]
+        [:script {:src "https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"}]
+        [:script {:src "https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"}]
+        [:script  "$(document).ready(function() {$('#issuestable').DataTable();});"]]
+      [:body
+        (report-header)
+        [:h5 {:class "p-3"} "All reported warnings:"]
+        [:div {:class "container-fluid"}
+          (snippets issues)
+          [:div {:id "responsive-wrapper" :class "table-responsive"}
+            [:table {:id "issuestable" :role "grid" :class "table table-sm table-striped table-hover table-bordered"}
+              [:thead
+                [:th "Tool"]
+                [:th "Type"]
+                [:th "Message"]
+                [:th "File"]
+                [:th "Location"]
+                [:th "Severity"]
+                [:th "See Details"]]
+              (reduce insert-rows [:tbody] issues)]]]]]))
 
 (defmethod r/report :html [issues options]
   (boot.util/info "reporting to html...")
-  (let [page (build issues options)]
-    (spit "issues.html" page)
-    page))
+  (build issues options))

@@ -9,11 +9,13 @@
 (defn eastwood-linting-callback [files handle-issue options]
   (fn [{:keys [warn-data kind] :as data}]
     (when (= :lint-warning kind)
-      (let [{:keys [file line column linter msg form]} warn-data
-            issue (ch/issue :eastwood linter msg (ch/coords file line column) nil)]
-        (if-let [warn-contents (load-issue-related-file-part files issue 5)]
-          (handle-issue (assoc issue :snippet warn-contents))
-          (handle-issue issue))))))
+      (let [exclude-linters (:exclude-linters options)
+            {:keys [file line column linter msg form]} warn-data]
+        (if-not (some #{linter} exclude-linters)
+          (let [issue (ch/issue :eastwood linter msg (ch/coords file line column) nil)]
+            (if-let [warn-contents (load-issue-related-file-part files issue 5)]
+              (handle-issue (assoc issue :snippet warn-contents))
+              (handle-issue issue))))))))
 
 (defn check [pod-pool fileset options & args]
   (let [worker-pod (pod-pool :refresh)
