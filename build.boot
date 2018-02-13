@@ -52,6 +52,24 @@
     (test-eastwood)
     (test-bikeshed)))
 
+(deftask check-all-serve []
+  (comp
+    (serve)
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed)
+    (wait)))
+
+(deftask check-all-serve-watch []
+  (comp
+    (serve)
+    (watch)
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed)))
+
 (bootlaces! +version+)
 
 (task-options!

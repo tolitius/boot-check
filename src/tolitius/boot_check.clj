@@ -24,7 +24,7 @@
     (doto content-file
       io/make-parents
       (spit content))
-    (let [new (-> fileset (core/add-source tmpdir))]
+    (let [new (core/add-source fileset tmpdir)]
       (core/commit! new))))
 
 (defn load-issues [fileset]
@@ -146,6 +146,6 @@
   []
   (core/with-pre-wrap fileset
     (when-let [issues (load-issues fileset)]
-      (when-not (empty? issues)
+      (when (seq issues)
         (throw (ex-info "Some of code checkers have failed." {:causes issues}))))
     fileset))

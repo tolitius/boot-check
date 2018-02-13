@@ -10,8 +10,7 @@
 
 (defn to-warning [problems]
   (when problems
-    (do
-     [(ch/issue :bikeshed :summary (str "Following bikeshed checks failed : " (clojure.string/join ", " problems)) (ch/coords " ? " " ? " " ? ") nil)])))
+    [(ch/issue :bikeshed :summary (str "Following bikeshed checks failed : " (clojure.string/join ", " problems)) (ch/coords " ? " " ? " " ? ") nil)]))
 
 (defn check [pod-pool fileset & args]
   (let [worker-pod (pod-pool :refresh)]

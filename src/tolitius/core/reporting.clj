@@ -1,5 +1,3 @@
-(ns tolitius.core.reporting
-  (:require [boot.core :as c]
-            [clojure.java.io :as io]))
-
+(ns tolitius.core.reporting)
+            
 (defmulti report (fn [issues options] (:reporter options)))
