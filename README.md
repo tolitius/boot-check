@@ -430,34 +430,42 @@ In case of Bikeshed, no errors / warnings are retured, since its own internal ch
 
 ## Reporting
 
-As long as standard console output may be sometimes difficult to read - boot-check contains reporting task 'boot-check-report' which will generate html report from all selected code checkers. With 'boot-check-report' task You can generate default hiccup powered html report using option switch like this one (this is also default reporter when option is not provided):
+As long as standard console output may be sometimes difficult to read - boot-check provides :gen-report option which will force specific checker task to report its warnings. All checker tasks with this option set to true will dump all found issues by appending them into shared interim warnings file. After that, file content will be loaded again and report will be generated. Boot-check allows plugging of new reporters. This can be done by implementing following multimethod:
 
 ```clojure
-(check/boot-check-report :options {:reporter :html})
+(defmethod tolitius.core.reporting/report :your-own-generator [issues options])
 ```
-Or You can register your own reporter. This is possible because boot-check-report internally delegates reporting to specific reporter using multimethod dispatch. For new reporter just implement this method:
 
+After providing source code with custom report generator implementation, a namespace must be evaluated.
+
+Below there is example on how to include checker task into reporting:
 ```clojure
-(defmethod tolitius.core.reporting/report :custom-reporter-key-goes-here [issues options])
+(check/with-kibit :options {:gen-report :true})
 ```
-Also You need to require your namespace containing above defmethod to evaluate it (probably in build.boot).
+and how to override default html report generator:
+```clojure
+(set-env! :boot-check-reporter :your-own-generator)
+(comp
+  (check/with-kibit :options {:gen-report :true}))
+```
 
-Look at how typical pipeline with reporting enabled (and additional throw-on-errors task) can look like:
+A typical pipeline with reporting enabled (and additional throw-on-errors task) can look like:
 
 ```clojure
 (deftask check-with-report []
+  (set-env! :boot-check-reporter :your-own-generator) ;;setup report generator
   (comp
-    (test-kibit)
-    (test-eastwood)
-    (test-yagni)
-    (test-bikeshed)
-    (check/boot-check-report :options {:reporter :html})
-    (check/throw-on-errors)))
+    (test-kibit)                                      ;; do not include in report - only stdout
+    (test-eastwood :options {:gen-report true})       ;; include in report and print stdout
+    (test-yagni)                                      ;; do not include in report - only stdout
+    (test-bikeshed :options {:gen-report true})       ;; include in report and print stdout
+    (check/throw-on-errors)))                         ;;throw errors after all.
 ```
-### Report samples
-And this is how reports look like : 
 
--This is report grid: 
+### Report samples
+And this is how reports look like :
+
+-This is report grid:
 
 ![alt text](screen-1.png)
 
@@ -466,7 +474,7 @@ And this is how reports look like :
 ![alt text](screen-2.png)
 
 ### Report limitations
-Due to implementation details of some of checkers (bikeshed, kibit) some limitations exists regarding amount of information visible on report. 
+Due to implementation details of some of checkers (bikeshed, kibit) some limitations exists regarding amount of information visible on report.
 - kibit currently does not return filenames, which makes it impossible to include it in the report (only stdout directly from kibit reports filenames :( )
 - bikeshed does not return issue details at all - it only returns some summary containing list of tests which has not passed. Because of that - reports only contain that summary for know for bikeshed.
 
