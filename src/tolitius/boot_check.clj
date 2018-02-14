@@ -45,10 +45,10 @@
     (let [fileset (append-issues fileset tmpdir issues)
           refreshed (load-issues fileset)
           report-content (r/report refreshed (assoc options :reporter reporter))]
-        (boot.util/info "\nWriting report to current directory...\n")
-        (spit final-report-file-name report-content)
-        (boot.util/info "\nWriting report to boot fileset TEMP directory...\n")
-        (write-report fileset tmpdir report-content))
+      (boot.util/info "\nWriting report to current directory...\n")
+      (spit final-report-file-name report-content)
+      (boot.util/info "\nWriting report to boot fileset TEMP directory...\n")
+      (write-report fileset tmpdir report-content))
     fileset))
 
 (defn bootstrap [fresh-pod]
@@ -63,7 +63,7 @@
 
 (defn- process-results [fileset tmpdir f msg throw? options]
   (when-let [{:keys [warnings]} (f)]
-    (when throw?
+    (when (and (seq warnings) throw?)
       (boot.util/warn-deprecated (str "\nWARN: throw-on-errors OPTION should be replaced by adding throw-on-errors TASK at the end of pipeline!^^^ \n"))
       (throw (ex-info msg {:causes warnings})))
     (if (true? (:gen-report options))
