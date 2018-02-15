@@ -13,7 +13,7 @@
     [:a {:class "navbar-brand" :href "#"} "Boot-Check Report"]
     [:div {:class "collapse navbar-collapse"}
       [:ul {:class "navbar-nav mr-auto"}
-        [:li {:class "nav-item active"} [:a {:class "nav-link"} "Issues"]]]        
+        [:li {:class "nav-item active"} [:a {:class "nav-link"} "Issues"]]]
       [:div  {:style "color:white"} (str "Report Time : " (java.util.Date.))]]])
 
 (defn- with-style [current-line-nr error-line-nr]
@@ -99,3 +99,5 @@
 
 (defmethod r/report :html [issues options]
   (build issues options))
+
+(defmethod r/report-extension :html [options] "html")

@@ -56,16 +56,18 @@
         skip-time?       (core/get-env :report-skip-time? false)
         fileset          (append-issues (start-date fileset tmpdir) tmpdir issues)
         refreshed        (load-issues fileset)
-        report-content   (r/report refreshed (assoc options :reporter reporter))]
+        ext-opts         (assoc options :reporter reporter)
+        report-extension (r/report-extension ext-opts)
+        report-content   (r/report refreshed ext-opts)]
     (let [date-suffix (if skip-time? "" (str "." (check-start-date fileset)))
-          dated-report-file-name (str report-file-name date-suffix ".html")]
+          dated-report-file-name (str report-file-name date-suffix "." report-extension)]
       (boot.util/dbug (str "\nWriting report to current directory: " report-path dated-report-file-name "...\n"))
       (doto
         (io/file (str report-path dated-report-file-name))
         io/make-parents
         (spit report-content)))
     (boot.util/dbug "\nWriting report to boot fileset TEMP directory...\n")
-    (write-report fileset tmpdir report-content report-file-name)))
+    (write-report fileset tmpdir report-content (str report-file-name "." report-extension))))
 
 (defn bootstrap [fresh-pod]
   (doto fresh-pod
