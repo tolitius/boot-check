@@ -466,9 +466,9 @@ A typical pipeline with reporting enabled (and additional throw-on-errors task) 
 ### Other Reporting Options
 Currently boot-check supports following reporting options:
 - boot-check-reporter - to allow hook with custom report generator implementation (described above)
-- report-file-name - a name of file pattern to be used when generating report files
+- report-file-name - a file name pattern to be used when generating report files
 - report-path - a path where report should be written.
-- report-skip-time? - if time factor should be included in file name. By default time factor is included but You may want to disable it for example to enable fast refreshing when report opened is in browser.
+- report-skip-time? - if time factor should be included in file name. By default time factor is included but You may want to disable it for example to enable fast refreshing when report is already opened in the browser.
 
 ### Report samples
 Take a look at how reports look like.
