@@ -1,4 +1,4 @@
-(def +version+ "0.1.7")
+(def +version+ "0.1.8")
 
 (set-env!
   :source-paths #{"src"}
@@ -56,6 +56,14 @@
     (test-yagni)
     (test-eastwood)
     (test-bikeshed)))
+
+(deftask check-all-and-throw []
+  (comp
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed)
+    (check/throw-on-errors)))
 
 (deftask check-all-serve []
   (comp
