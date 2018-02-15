@@ -13,7 +13,7 @@
 
 (def ^:const interim-report-data-file "interim-data")
 
-(def ^:const final-report-file-name "report.html")
+(def ^:const final-report-file-name "boot-check-report")
 
 (def pod-deps
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
@@ -41,15 +41,22 @@
   (store-tmp-file fileset tmpdir report final-report-file-name))
 
 (defn- do-report [fileset tmpdir issues options]
-  (if-let [reporter (core/get-env :boot-check-reporter :html)]
-    (let [fileset (append-issues fileset tmpdir issues)
-          refreshed (load-issues fileset)
-          report-content (r/report refreshed (assoc options :reporter reporter))]
-      (boot.util/info "\nWriting report to current directory...\n")
-      (spit final-report-file-name report-content)
-      (boot.util/info "\nWriting report to boot fileset TEMP directory...\n")
-      (write-report fileset tmpdir report-content))
-    fileset))
+  (let [reporter         (core/get-env :boot-check-reporter :html)
+        report-path      (core/get-env :report-path  "")
+        report-file-name (core/get-env :report-file-name final-report-file-name)
+        skip-time?       (core/get-env :report-skip-time? false)
+        fileset          (append-issues fileset tmpdir issues)
+        refreshed        (load-issues fileset)
+        report-content   (r/report refreshed (assoc options :reporter reporter))]
+    (let [date-suffix (if skip-time? "" (str "." (.format (java.text.SimpleDateFormat. "yyyy_MM_dd_HH_mm_ss") (java.util.Date.))))
+          dated-report-file-name (str report-file-name date-suffix ".html")]
+      (boot.util/dbug (str "\nWriting report to current directory: " report-path dated-report-file-name "...\n"))
+      (doto
+        (io/file (str report-path dated-report-file-name))
+        io/make-parents
+        (spit report-content)))
+    (boot.util/dbug "\nWriting report to boot fileset TEMP directory...\n")
+    (write-report fileset tmpdir report-content)))
 
 (defn bootstrap [fresh-pod]
   (doto fresh-pod

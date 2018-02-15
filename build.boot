@@ -46,9 +46,7 @@
 (deftask test-bikeshed []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-bikeshed)
     (check/with-bikeshed :options {:check? #{:long-lines :trailing-whitespace :var-redefs :bad-methods :name-collisions}
-                                   :verbose true
                                    :max-line-length 42
                                    :gen-report true})))
 

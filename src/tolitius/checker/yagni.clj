@@ -14,7 +14,7 @@
   (s/join "\n" s))
 
 (defn- namespace->file [namespace]
-  (clojure.string/replace (clojure.string/replace (str namespace) #"\." "\\\\") #"/.*" ".clj"))
+  (str (clojure.string/replace (clojure.string/replace (str namespace) #"/.*" "") #"\." "/") ".clj"))
 
 (defn- error-desc [family varname]
   (cond

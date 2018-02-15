@@ -463,17 +463,23 @@ A typical pipeline with reporting enabled (and additional throw-on-errors task) 
     (test-bikeshed :options {:gen-report true})       ;; include in report and print stdout
     (check/throw-on-errors)))                         ;;throw errors after all.
 ```
+### Other Reporting Options
+Currently boot-check supports following reporting options:
+- boot-check-reporter - to allow hook with custom report generator implementation (described above)
+- report-file-name - a name of file pattern to be used when generating report files
+- report-path - a path where report should be written.
+- report-skip-time? - if time factor should be included in file name. By default time factor is included but You may want to disable it for example to enable fast refreshing when report opened is in browser.
 
 ### Report samples
 Take a look at how reports look like.
 
 #### Report grid view
 
-![alt text](screen-1.png)
+![alt text](doc/img/sample-report.png)
 
 #### Issue details view (currently only code snippet is showing in here.)
 
-![alt text](screen-2.png)
+![alt text](doc/img/issue-details.png)
 
 ### Report limitations
 
