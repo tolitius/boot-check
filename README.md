@@ -31,6 +31,7 @@ It relies on universe tested [kibit](https://github.com/jonase/kibit),
   - [Yagni Exceptions](#yagni-exceptions)
   - [Eastwood Exceptions](#eastwood-exceptions)
   - [Bikeshed Exceptions](#bikeshed-exceptions)
+  - [Aggregating Errors](#aggregating-errors)
 - [Reporting](#reporting)  
 - [Demo](#demo)
 - [License](#license)
@@ -426,32 +427,112 @@ boot.user=> *e
 
 In case of Bikeshed, no errors / warnings are retured, since its own internal checks just return true/false values. But the exception is raised nevertheless to indicate that some checks have failed.
 
-### Aggregated Exceptions Handling
+### Aggregating Errors
 
-For some cases when You want to throw exception containing warnings reported by all checkers (and do not stop after first checker reports errors) You can use task called 'throw-on-errors'. Throwing exception in the middle of the pipeline by single checker is not perfect approach as long as You still may want to report  errors from other 'pending' checkers. To overcome this issue - just place 'throw-on-errors' at the end of the boot pipeline. By following that approach You will throw exception once with all possible errors aggregated during entire pipeline execution.
+There are a couple of ways `boot-check` deals with exceptions:
+
+* report problems, but throw no exceptions
+
+this is a default behavior, here is an [example](build.boot#L53-L58) from build.boot:
+
+```clojure
+(deftask check-all []
+  (comp
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed))
+```
+
+* force to throw exceptions when errors are found
+
+This is done by the `throw-on-error` boot task. Here are a couple of examples.
+
+This [example]( build.boot#L40-L44) would run eastwood checker and would throw an exception right after it in case eastwood finds problems:
+
+```clojure
+(deftask test-eastwood-and-throw []
+  (set-env! :source-paths #{"src" "test"})
+  (comp
+    (check/with-eastwood :options {:gen-report true :exclude-linters [:unused-ret-vals]})
+    (check/throw-on-errors)))
+```
+
+this [example](build.boot#L60-L66) would run all the checkers and if any of these checkers report errors it will _aggregate_ all of these errors and throw an exception including all of them:
+
+```clojure
+(deftask check-all-and-throw []
+  (comp
+    (test-kibit)
+    (test-yagni)
+    (test-eastwood)
+    (test-bikeshed)
+    (check/throw-on-errors)))
+```
+
+if errors are found their aggregate is thrown:
+
+```clojure
+clojure.lang.ExceptionInfo: Some of code checkers have failed.
+    causes: ({:category nil,
+              :linter-tool :kibit,
+              :key "kibit",
+              :coords
+              {:file nil, :line 5, :column 28, :line-end nil, :column-end nil},
+              :snippet nil,
+              :issue-form nil,
+              :id "5616d90d-d957-4b15-bf53-082a0f82892a",
+              :severity :normal,
+              :hint-form nil,
+              :message
+              "Consider changing [ (fn [options] (:reporter options)) ] with [ :reporter ]"}
+             {:category nil,
+              :linter-tool :yagni,
+              :key :no-parent-refs,
+              :coords
+              {:file "tolitius/boot/helper.clj",
+               :line 0,
+               :column 0,
+               :line-end nil,
+               :column-end nil},
+              :snippet nil,
+              :issue-form nil,
+              :id "90249104-8b32-4125-9286-05f9fe3f13bf",
+              :severity :normal,
+              :hint-form nil,
+              :message
+              "Var tolitius.boot.helper/make-pod-pool is referenced by unused code"}
+              ... ...
+```
+
 
 ## Reporting
 
-As long as standard console output may be sometimes difficult to read - boot-check provides :gen-report option which forces particular checker task to report its warnings. All checkers with this option set to true will dump found issues by appending them into shared interim warnings file. Then file content will be loaded again and report will be generated. Boot-check allows plugging of new reporters. This can be done by implementing following multimethod:
+Besides reporting errors to standard output (stdout) which could be diffficult to inspect `boot-check` can generate other reports in different formats (default and built in is HTML) with a help of a `:gen-report` option which forces a particular checker task to report its warnings.
+
+All checkers with this option set to true will write found issues into a shared interim warnings file. Later this file will be used to generate the final report. `boot-check` allows plugging in new reporters. This can be done by implementing the following multimethod:
 
 ```clojure
 (defmethod tolitius.core.reporting/report :your-own-generator [issues options])
 ```
 
-After providing source code with custom report generator a namespace containing that generator must be evaluated.
+After providing source code with a custom report generator a namespace containing that generator must be evaluated.
 
-Below there is example showing how to include checker task into reporting:
+Here is an example of how to include a checker task into reporting:
+
 ```clojure
 (check/with-kibit :options {:gen-report :true})
 ```
+
 and how to override default html report generator:
+
 ```clojure
 (set-env! :boot-check-reporter :your-own-generator)
 (comp
   (check/with-kibit :options {:gen-report :true}))
 ```
 
-A typical pipeline with reporting enabled (and additional throw-on-errors task) can look like this:
+A typical pipeline with reporting enabled (and additional `throw-on-errors` task) may look like this:
 
 ```clojure
 (deftask check-with-report []
@@ -463,29 +544,31 @@ A typical pipeline with reporting enabled (and additional throw-on-errors task) 
     (test-bikeshed :options {:gen-report true})       ;; include in report and print stdout
     (check/throw-on-errors)))                         ;;throw errors after all.
 ```
+
 ### Other Reporting Options
+
 Currently boot-check supports following reporting options:
-- boot-check-reporter - to allow hook with custom report generator implementation (described above)
-- report-file-name - a file name pattern to be used when generating report files
-- report-path - a path where report should be written.
-- report-skip-time? - if time factor should be included in file name. By default time factor is included but You may want to disable it for example to enable fast refreshing when report is already opened in the browser.
+
+* `boot-check-reporter`: a hook to a custom report generator implementation (described above)
+* `report-file-name`: a file name pattern to be used when generating report files
+* `report-path`: a file path where this report should be written to
+* `report-skip-time?`: whether a timestamp should be included in the file name. By default a timestamp is included but you may want to disable it for example to enable fast refreshing when report is already opened in the browser
 
 ### Report samples
-Take a look at how reports look like.
 
-#### Report grid view
+A "grid" view:
 
-![alt text](doc/img/sample-report.png)
+![sample boot check report](doc/img/sample-report.png)
 
-#### Issue details view (currently only code snippet is showing in here.)
+"Issue details" view (currently only code snippet is showing in here):
 
-![alt text](doc/img/issue-details.png)
+![issue details view](doc/img/issue-details.png)
 
 ### Report limitations
 
-Due to implementation details of some of checkers (bikeshed, kibit) some limitations exists regarding amount of information visible on report.
-- kibit currently does not return filenames, which makes it impossible to include it in the report (only stdout directly from kibit reports filenames :())
-- bikeshed does not return issue details at all - it only returns some summary containing list of tests which has not passed. Because of that - reports only contain that summary for know for bikeshed.
+Due to implementation details of some of checkers (bikeshed, kibit) some limitations exist regarding amount of information visible on report.
+- kibit currently does not return filenames, which makes it impossible to include it in the report (only stdout directly from kibit reports filenames)
+- bikeshed does not return issue details at all - it only returns some summary containing list of tests which has not passed. Because of that - reports only contain that summary returned from bikeshed.
 
 ## Demo
 
@@ -493,7 +576,7 @@ Here is a boot check [demo project](https://github.com/tolitius/check-boot-check
 
 ## License
 
-Copyright © 2016 toliitus
+Copyright © 2018 toliitus
 
 Distributed under the Eclipse Public License either version 1.0 or (at)
 your option any later version.
