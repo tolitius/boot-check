@@ -19,7 +19,6 @@
   '[[org.clojure/tools.namespace "0.2.11" :exclusions [org.clojure/clojure]]])
 
 (defn- store-tmp-file [fileset tmpdir content filename]
-  (core/empty-dir! tmpdir)
   (let [content-file (io/file tmpdir filename)]
     (doto content-file
       io/make-parents
@@ -50,6 +49,7 @@
   (store-tmp-file fileset tmpdir report filename))
 
 (defn- do-report [fileset tmpdir issues options]
+  (core/empty-dir! tmpdir)
   (let [reporter         (core/get-env :boot-check-reporter :html)
         report-path      (core/get-env :report-path  "")
         report-file-name (core/get-env :report-file-name default-report-file-name)
