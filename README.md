@@ -518,8 +518,15 @@ All checkers with this option set to true will write found issues into a shared 
 
 After providing source code with a custom report generator a namespace containing that generator must be evaluated.
 
-Here is an example of how to include a checker task into reporting:
+In case when You want to use default html reporting You also need to add following line into your build.boot:
 
+```Clojure
+(require '[tolitius.reporter.html])
+```          
+Above line will evaluate tolitius.reporter.html namespace which currently contains default html report generator implementation.
+Without above line, clojure runtime will not be able to locate multimethod implementation.
+
+Here is an example of how to include a checker task into reporting:
 ```clojure
 (check/with-kibit :options {:gen-report :true})
 ```
