@@ -1,3 +1,8 @@
+## 0.1.9
+###### Mon Feb 19 11:00:55 2018 -0500
+
+* empty temp directory on report generation [#18](https://github.com/tolitius/boot-check/pull/18) by [@voytech](https://github.com/voytech)
+
 ## 0.1.8
 ###### Thu Feb 15 14:03:52 2018 -0500
 
