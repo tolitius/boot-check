@@ -28,8 +28,7 @@
       (let [sources# #{~@(tmp-dir-paths fileset)}
             _ (boot.util/dbug (str "eastwood is about to look at: -- " sources# " --"))
             {:keys [some-warnings] :as checks} (eastwood/eastwood {:source-paths sources#
-                                                                   :exclude-linters ~exclude-linters
-                                                                   :debug #{:compare-forms}})
+                                                                   :exclude-linters ~exclude-linters })
 
             issues# (atom #{})]
         (if some-warnings
