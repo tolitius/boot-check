@@ -4,7 +4,7 @@
             [boot.pod  :as pod]))
 
 (def eastwood-deps
-  '[[jonase/eastwood "0.2.5" :exclusions [org.clojure/clojure]]])
+  '[[jonase/eastwood "0.3.3" :exclusions [org.clojure/clojure]]])
 
 (defn eastwood-linting-callback [files handle-issue options]
   (fn [{:keys [warn-data kind] :as data}]

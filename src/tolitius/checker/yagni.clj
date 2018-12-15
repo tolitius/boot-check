@@ -5,7 +5,7 @@
             [clojure.string :as s]))
 
 (def yagni-deps
-  '[[venantius/yagni "0.1.6" :exclusions [org.clojure/clojure]]])
+  '[[venantius/yagni "0.1.7" :exclusions [org.clojure/clojure]]])
 
 ;; yagni implementation (07/26/2016) is coupled with a lein specific file
 (defonce entry-points-file ".lein-yagni")

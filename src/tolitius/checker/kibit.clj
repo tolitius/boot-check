@@ -5,7 +5,7 @@
             [boot.pod  :as pod]))
 
 (def kibit-deps
-  '[[jonase/kibit "0.1.5"]
+  '[[jonase/kibit "0.1.6"]
     [org.clojure/tools.cli "0.3.3"]])
 
 ;;Kibit does not report file :(  - it is a bug. Next version of kibit will support that.
