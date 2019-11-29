@@ -4,7 +4,7 @@
             [boot.pod  :as pod]))
 
 (def eastwood-deps
-  '[[jonase/eastwood "0.3.3" :exclusions [org.clojure/clojure]]])
+  '[[jonase/eastwood "0.3.5" :exclusions [org.clojure/clojure]]])
 
 (defn eastwood-linting-callback [files handle-issue options]
   (fn [{:keys [warn-data kind] :as data}]
@@ -23,19 +23,16 @@
         exclude-linters (:exclude-linters options)]
     (pod/with-eval-in worker-pod
       (require '[eastwood.lint :as eastwood]
+               '[eastwood.reporting-callbacks :as reporting]
                '[tolitius.checker.eastwood :as checker]
                '[tolitius.core.check :as ch])
       (let [sources# #{~@(tmp-dir-paths fileset)}
             _ (boot.util/dbug (str "eastwood is about to look at: -- " sources# " --"))
             {:keys [some-warnings] :as checks} (eastwood/eastwood {:source-paths sources#
-                                                                   :exclude-linters ~exclude-linters })
+                                                                   :exclude-linters ~exclude-linters})
 
             issues# (atom #{})]
         (if some-warnings
-          (do
-            (boot.util/warn (str "\nWARN: eastwood found some problems ^^^ \n\n"))
-            (eastwood/eastwood-core (eastwood/last-options-map-adjustments  ;; TODO rerun to get the actual errors, but otherwise need to rewrite eastwood/eastwood
-                                        {:source-paths sources#
-                                         :callback (checker/eastwood-linting-callback ~inputs #(swap! issues# conj %) ~options)})))
+          (boot.util/warn (str "\nWARN: eastwood found some problems ^^^ \n\n"))
           (boot.util/info "\nlatest report from eastwood.... [You Rock!]\n"))
         {:warnings (or (vec @issues#) [])}))))

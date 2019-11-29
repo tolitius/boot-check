@@ -5,7 +5,7 @@
             [boot.pod  :as pod]))
 
 (def kibit-deps
-  '[[jonase/kibit "0.1.6"]
+  '[[jonase/kibit "0.1.8"]
     [org.clojure/tools.cli "0.3.3"]])
 
 ;;Kibit does not report file :(  - it is a bug. Next version of kibit will support that.
@@ -31,4 +31,4 @@
         (if-not (zero? (count problems#))
           (boot.util/warn (str "\nWARN: kibit found some problems: \n\n" {:problems (set problems#)} "\n"))
           (boot.util/info "\nlatest report from kibit.... [You Rock!]\n"))
-        {:warnings (or (mapv checker/normalise-issue (vec problems#)) [])}))))
+          {:warnings (or (mapv checker/normalise-issue (vec problems#)) [])}))))

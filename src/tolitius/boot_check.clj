@@ -67,7 +67,8 @@
         io/make-parents
         (spit report-content)))
     (boot.util/dbug "\nWriting report to boot fileset TEMP directory...\n")
-    (write-report fileset tmpdir report-content (str report-file-name "." report-extension))))
+    (write-report fileset tmpdir report-content (str report-file-name "." report-extension))
+    fileset))
 
 (defn bootstrap [fresh-pod]
   (doto fresh-pod
@@ -86,7 +87,8 @@
       (throw (ex-info msg {:causes warnings})))
     (if (true? (:gen-report options))
       (do-report fileset tmpdir warnings options)
-      fileset)))
+      fileset))
+  fileset)
 
 (deftask with-kibit
   "Static code analyzer for Clojure, ClojureScript, cljx and other Clojure variants.

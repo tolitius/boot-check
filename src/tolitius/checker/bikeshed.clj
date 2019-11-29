@@ -4,8 +4,8 @@
             [boot.pod :as pod]))
 
 (def bikeshed-deps
-  '[[org.clojure/clojure "1.8.0"]
-    [lein-bikeshed "0.5.1" :exclusions [org.clojure/tools.cli
+  '[[org.clojure/clojure "1.10.1"]
+    [lein-bikeshed "0.5.2" :exclusions [org.clojure/tools.cli
                                         org.clojure/tools.namespace]]])
 
 (defn to-warning [problems]
